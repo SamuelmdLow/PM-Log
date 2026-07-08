@@ -32,6 +32,8 @@
 		"@sveltejs/adapter-static": "^3.0.10",
 		"@sveltejs/kit": "^2.63.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
+		"@types/d3": "^7.4.3",
+		"@types/d3-geo": "^3.1.0",
 		"@types/node": "^24",
 		"@vitest/browser-playwright": "^4.1.8",
 		"@vitest/coverage-v8": "^4.1.8",
@@ -53,6 +55,8 @@
 		"vitest-browser-svelte": "^2.1.1"
 	},
 	"dependencies": {
-		"@urql/svelte": "^5.0.0"
+		"@urql/svelte": "^5.0.0",
+		"d3": "^7.9.0",
+		"d3-geo": "^3.1.1"
 	}
 }

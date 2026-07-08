@@ -39,7 +39,6 @@ time {
 
 h4 {
     font-weight: 500;
-    padding-inline: 1.5rem;
     color: var(--color-text-100)
 }
 

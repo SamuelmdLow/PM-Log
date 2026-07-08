@@ -21,7 +21,7 @@
 
 	<footer>
 		<p>
-			visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
+			Created by Sam Low. Information is scraped from <a href="https://www.pm.gc.ca/">pm.gc.ca</a> and <a href="https://www.cpac.ca/">cpac.ca</a>.
 		</p>
 	</footer>
 </div>
@@ -39,7 +39,7 @@
 		flex-direction: column;
 		padding: 1rem;
 		width: 100%;
-		max-width: 64rem;
+		max-width: 1500px;
 		margin: 0 auto;
 		box-sizing: border-box;
 	}
