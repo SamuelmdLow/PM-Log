@@ -1,14 +1,18 @@
 <script lang="ts">
+	import { now } from '../lib/time.js';
 	import { queryStore, gql, getContextClient } from '@urql/svelte';
 	import ScheduleItem from './ScheduleItem.svelte';
 	import UpcomingScheduleItem from './UpcomingScheduleItem.svelte';
 	import Globe from './Globe.svelte';
 
+	let limit = 100;
+	let offset = 0;
+
 	const schedule = queryStore({
 		client: getContextClient(),
 		query: gql`
-			query MyQuery {
-				allScheduleItems {
+			query MyQuery($limit: Int!, $offset: Int!) {
+				allScheduleItems(first: $limit, offset: $offset) {
 					edges {
 						node {
 							content
@@ -16,6 +20,7 @@
 							datetime
 							location {
 								name
+								timezone
 							}
 							attachments {
 								edges {
@@ -30,7 +35,8 @@
 					}
 				}
 			}
-		`
+    	`,
+		variables: {limit, offset},
 	});
 
 	function getDate(edge: any) {
@@ -45,6 +51,32 @@
 			month: "long",
 			day: "numeric", })
 			.format(date) + ".";
+	}
+
+	function dateFormat(datetime: Date, timezone: String | null) {
+		if (timezone==null) {
+			timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		}
+
+		const options = {      
+			hour: "numeric",
+    		minute: "2-digit",
+			timeZoneName: "shortOffset",
+			timeZone: timezone,} as Intl.DateTimeFormatOptions;
+
+		return new Intl.DateTimeFormat('en-US', options).format(datetime);
+	}
+
+	function futureSchedule(schedule: any) {
+		return schedule.allScheduleItems.edges
+								.filter((edge: any) => new Date(edge.node.datetime) > $now)
+								.reverse();
+	}
+
+	
+	function pastSchedule(schedule: any) {
+		return schedule.allScheduleItems.edges
+						.filter((edge: any) => new Date(edge.node.datetime) <= $now)
 	}
 </script>
 
@@ -70,16 +102,18 @@
 
 	<div class="container">
 		<div class="sidebar">
-			<h2>Upcoming</h2>
 			{#if $schedule.fetching}
 				<p>Loading...</p>
 			{:else if $schedule.error}
 				<p>Oh no... {$schedule.error.message}</p>
 			{:else}
+				<h2 class="visually-hidden">Future</h2>
+				<div>
+					<div class="local-time-header"><time datetime={$now.toLocaleTimeString()}>{dateFormat($now, null)}</time></div>
+					<div>{futureSchedule($schedule.data)[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, futureSchedule($schedule.data)[0].node.location.timezone)}</time></div>
+				</div>
 				<ul>
-					{#each Object.entries(Object.groupBy($schedule.data.allScheduleItems.edges
-								.filter((edge: any) => new Date(edge.node.datetime) > new Date())
-								.reverse(), getDate)) as [date, items]}
+					{#each Object.entries(Object.groupBy(futureSchedule($schedule.data), getDate)) as [date, items]}
 						<li class="date-group">
 							{#if date != "Today"}
 							<h3>{date}</h3>
@@ -104,7 +138,7 @@
 				<p>Oh no... {$schedule.error.message}</p>
 			{:else}
 				<ul>
-					{#each Object.entries(Object.groupBy( $schedule.data.allScheduleItems.edges.filter((edge: any) => new Date(edge.node.datetime) <= new Date()), getDate )) as [date, items]}
+					{#each Object.entries(Object.groupBy( pastSchedule($schedule.data), getDate )) as [date, items]}
 						<li class="date-group">
 							{#if date != "Today"}
 							<h3 class="date-heading">{date}</h3>
@@ -129,6 +163,7 @@
 
 <style>
 	h1 {
+		margin-bottom: 0;
 		text-align: center;
 		letter-spacing: 0.25em;
 		.title-upper {
@@ -161,6 +196,10 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
+	}
+	.local-time-header {
+		font-size: 2em;
+		font-weight: 600;
 	}
 
 	.date-group {

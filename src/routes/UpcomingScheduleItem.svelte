@@ -1,12 +1,15 @@
 <script lang="ts">
     import { timeString } from '../lib/utils.ts';
+    import {now} from "../lib/time.js";
+    
     let { node } = $props();
+
 
 </script>
 
 <div class="schedule-item">
     <h4>
-        <time datetime={node.datetime}>{timeString(node.datetime)}</time> <a href={node.source}>{node.content}</a>
+        <time datetime={node.datetime}>{timeString(node.datetime, $now)}</time> <a href={node.source}>{node.content}</a>
         <span class="location">{node.location.name}</span>
     </h4>
     {#if node.attachments.edges.length > 0}
@@ -45,7 +48,6 @@ h4 {
 li {
     border-left: 2px solid var(--color-border);
     padding-left: 1rem;
-    margin-inline: 1.5rem;
     list-style: none;
 }
 

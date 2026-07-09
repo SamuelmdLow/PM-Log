@@ -1,6 +1,6 @@
-export function timeString(datetime: string) {
+export function timeString(datetime: string, now: Date) {
     const date = new Date(datetime);
-    const delta = new Date().valueOf() - date.valueOf()
+    const delta = now.valueOf() - date.valueOf()
     if (Math.abs(delta) < 60 * 60 * 1000) {
         if (delta > 0 && delta < 60 * 1000) {
             return "Just now.";

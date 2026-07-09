@@ -28,7 +28,7 @@
 	--color-bg-1: #FFFEEE;
 	--color-bg-2: hsl(224, 44%, 95%);
 	
-	--color-theme-1: #ff3e00;
+	--color-theme-1: #6F0E1E;
 	--color-theme-2: #4075a6;
 	
 	--color-text-100: rgba(0, 0, 0, 0.9);	
@@ -48,6 +48,7 @@
 body {
 	min-height: 100vh;
 	margin: 0;
+	border: 1em solid var(--color-theme-1);
 	background-attachment: fixed;
 	background-color: var(--color-bg-1);
 	background-size: 100vw 100vh;
@@ -66,4 +67,15 @@ a {
 	&:hover {
 		text-decoration: underline;	
 	}
+}
+
+.visually-hidden {
+  border: 0;
+  clip-path: inset(50%);
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
