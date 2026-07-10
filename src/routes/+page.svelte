@@ -5,6 +5,8 @@
 	import UpcomingScheduleItem from './UpcomingScheduleItem.svelte';
 	import Globe from './Globe.svelte';
 
+	let selectedCoordinate = $state([79.3839347, -43.6534817]);
+
 	let limit = 100;
 	let offset = 0;
 
@@ -21,6 +23,8 @@
 							location {
 								name
 								timezone
+								longitude
+								latitude
 							}
 							attachments {
 								edges {
@@ -90,7 +94,7 @@
 	<div class="background-map">
 		<div class="globe-container">
 			<div class="globe-wrapper">
-			<Globe />
+			<Globe bind:focus={selectedCoordinate}/>
 			</div>
 		</div>
 	</div>
@@ -110,8 +114,13 @@
 				<h2 class="visually-hidden">Future</h2>
 				<div>
 					<div class="local-time-header"><time datetime={$now.toLocaleTimeString()}>{dateFormat($now, null)}</time></div>
+					{#if futureSchedule($schedule.data).length > 0}
 					<div>{futureSchedule($schedule.data)[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, futureSchedule($schedule.data)[0].node.location.timezone)}</time></div>
+					{:else}
+					<div>{pastSchedule($schedule.data)[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, pastSchedule($schedule.data)[0].node.location.timezone)}</time></div>
+					{/if}
 				</div>
+				{#if futureSchedule($schedule.data).length > 0}
 				<ul>
 					{#each Object.entries(Object.groupBy(futureSchedule($schedule.data), getDate)) as [date, items]}
 						<li class="date-group">
@@ -128,6 +137,9 @@
 						</li>
 					{/each}
 				</ul>
+				{:else}
+				<p>Nothing on schedule...</p>
+				{/if}
 			{/if}
 		</div>
 
@@ -146,7 +158,7 @@
 							<ul>
 								{#each items as item}
 									<li>
-										<ScheduleItem node={item.node} />
+										<ScheduleItem node={item.node} bind:selectedCoordinate={selectedCoordinate}/>
 									</li>
 								{/each}
 							</ul>

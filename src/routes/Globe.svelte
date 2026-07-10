@@ -2,6 +2,11 @@
     // https://www.d3indepth.com/geographic/
     import { geoPath, geoOrthographic, geoGraticule } from 'd3-geo';
     import { onMount } from 'svelte';
+    import { select } from 'd3';
+    import { zoom, zoomTransform, zoomIdentity } from 'd3-zoom';
+
+    let {focus = $bindable()} = $props();
+    let rotation = $state(focus);
 
     onMount(() => {
 
@@ -18,11 +23,22 @@
         .projection(projection)
         .pointRadius(4)
         .context(context);
+        // 79.3839347, -43.6534817
+        projection.rotate(rotation);
 
-        let yaw = 300;
-
+        
         function update() {
-            projection.rotate([yaw, -45])
+            const difLong = focus[0] - rotation[0];
+            const difLat = focus[1] - rotation[1];
+            const difTotal = Math.sqrt(Math.pow(difLong, 2) + Math.pow(difLat, 2));
+            if (difTotal > 1) {
+                const ratio = 1/Math.sqrt(difTotal);
+
+                rotation[0] = rotation[0] + (difLong * ratio);
+                rotation[1] = rotation[1] + (difLat * ratio);
+
+                projection.rotate(rotation);
+            }
 
             context.clearRect(0, 0, 800, 600);
 
@@ -39,11 +55,7 @@
             context.strokeStyle = '#ccc';
             geoGenerator(graticule());
             context.stroke();
-
-            yaw -= 0.2
         }
-
-
         fetch('https://gist.githubusercontent.com/d3indepth/f28e1c3a99ea6d84986f35ac8646fac7/raw/c58cede8dab4673c91a3db702d50f7447b373d98/ne_110m_land.json')
             .then(response => response.text())
             .then(response => {

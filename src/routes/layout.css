@@ -79,3 +79,10 @@ a {
   white-space: nowrap;
   width: 1px;
 }
+
+button {
+	background: none;
+	border: none;
+	border-radius: 0;
+	cursor: pointer;
+}

@@ -21,7 +21,7 @@
 
 	<footer>
 		<p>
-			Created by Sam Low. Information is scraped from <a href="https://www.pm.gc.ca/">pm.gc.ca</a> and <a href="https://www.cpac.ca/">cpac.ca</a>.
+			Created by <a href="https://github.com/SamuelmdLow">Sam Low</a>. Information is scraped from <a href="https://www.pm.gc.ca/">pm.gc.ca</a> and <a href="https://www.cpac.ca/">cpac.ca</a>.
 		</p>
 	</footer>
 </div>

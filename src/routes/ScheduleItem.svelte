@@ -2,14 +2,18 @@
     import { timeString } from '../lib/utils.ts';
     import {now} from "../lib/time.js";
     
-    let { node } = $props();
+    let { node, selectedCoordinate = $bindable() } = $props();
+
+    function setLocation(location: any) {
+        selectedCoordinate = [location.longitude*-1, location.latitude*-1];
+    }
 
 </script>
 
-<div class="schedule-item">
+<div class="schedule-item" onmouseover={(e: FocusEvent) => setLocation(node.location)}>
     <h4>
         <time datetime={node.datetime}>{timeString(node.datetime, $now)}</time> <a href={node.source}>{node.content}</a>
-        <span class="location">{node.location.name}</span>
+        <button class="location" onclick={(e: MouseEvent) => setLocation(node.location)}>{node.location.name}</button>
     </h4>
     {#if node.attachments.edges.length > 0}
     <ul>
@@ -37,6 +41,9 @@ time {
     font-weight: 400;
     font-size: 0.75em;
     color: var(--color-text-300);
+}
+.location:hover {
+    opacity: 0.75;
 }
 
 h4 {
