@@ -17,22 +17,21 @@
         let geojson: Record<string, any> = {}
 
         let projection = geoOrthographic()
-        .scale(300);
+            .scale(300);
 
         let geoGenerator = geoPath()
-        .projection(projection)
-        .pointRadius(4)
-        .context(context);
-        // 79.3839347, -43.6534817
-        projection.rotate(rotation);
+            .projection(projection)
+            .pointRadius(4)
+            .context(context);
 
-        
+        projection.rotate(rotation);
+    
         function update() {
             const difLong = focus[0] - rotation[0];
             const difLat = focus[1] - rotation[1];
             const difTotal = Math.sqrt(Math.pow(difLong, 2) + Math.pow(difLat, 2));
-            if (difTotal > 1) {
-                const ratio = 1/Math.sqrt(difTotal);
+            if (difTotal > 0) {
+                const ratio = Math.min(1/Math.sqrt(difTotal), difTotal);
 
                 rotation[0] = rotation[0] + (difLong * ratio);
                 rotation[1] = rotation[1] + (difLat * ratio);
@@ -46,7 +45,7 @@
             context.strokeStyle = '#333';
 
             context.beginPath();
-            geoGenerator({type: 'FeatureCollection', features: geojson.features})
+            geoGenerator({type: 'FeatureCollection', features: geojson.features});
             context.stroke();
 
             // Graticule

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { now } from '../lib/time.js';
-	import { queryStore, gql, getContextClient } from '@urql/svelte';
+	import { getContextClient } from '@urql/svelte';
 	import ScheduleItem from './ScheduleItem.svelte';
 	import UpcomingScheduleItem from './UpcomingScheduleItem.svelte';
 	import Globe from './Globe.svelte';
@@ -8,11 +8,9 @@
 	let selectedCoordinate = $state([79.3839347, -43.6534817]);
 
 	let limit = 100;
-	let offset = 0;
+	let offset = $state(0);
 
-	const schedule = queryStore({
-		client: getContextClient(),
-		query: gql`
+	const QUERY = `
 			query MyQuery($limit: Int!, $offset: Int!) {
 				allScheduleItems(first: $limit, offset: $offset) {
 					edges {
@@ -39,9 +37,25 @@
 					}
 				}
 			}
-    	`,
-		variables: {limit, offset},
-	});
+    	`;
+
+	let schedule = $state([]);
+	let endOfSchedule = $state(false);
+
+	const client = getContextClient();
+	function addScheduieItems() {
+		client
+			.query(QUERY, {limit, offset})
+			.toPromise()
+			.then(result => {
+				const newItems = result.data.allScheduleItems.edges;
+				if (newItems.length > 0) {
+					schedule = schedule.concat(result.data.allScheduleItems.edges);
+				} else {
+					endOfSchedule = true;
+				}
+			});
+	}
 
 	function getDate(edge: any) {
 		const date = new Date(edge.node.datetime);
@@ -71,17 +85,20 @@
 		return new Intl.DateTimeFormat('en-US', options).format(datetime);
 	}
 
-	function futureSchedule(schedule: any) {
-		return schedule.allScheduleItems.edges
-								.filter((edge: any) => new Date(edge.node.datetime) > $now)
-								.reverse();
+	function getFutureSchedule(schedule: any, now: Date) {
+		return schedule
+					.filter((edge: any) => new Date(edge.node.datetime) > now)
+					.reverse();
 	}
 
-	
-	function pastSchedule(schedule: any) {
-		return schedule.allScheduleItems.edges
-						.filter((edge: any) => new Date(edge.node.datetime) <= $now)
+	function getPastSchedule(schedule: any, now: Date) {
+		return schedule
+					.filter((edge: any) => new Date(edge.node.datetime) <= now)
 	}
+
+	addScheduieItems();
+	let futureSchedule = $derived(getFutureSchedule(schedule, $now));
+	let pastSchedule = $derived(getPastSchedule(schedule, $now));
 </script>
 
 <svelte:head>
@@ -106,23 +123,25 @@
 
 	<div class="container">
 		<div class="sidebar">
-			{#if $schedule.fetching}
+			{#if schedule.length <= 0}
 				<p>Loading...</p>
-			{:else if $schedule.error}
-				<p>Oh no... {$schedule.error.message}</p>
 			{:else}
 				<h2 class="visually-hidden">Future</h2>
 				<div>
 					<div class="local-time-header"><time datetime={$now.toLocaleTimeString()}>{dateFormat($now, null)}</time></div>
-					{#if futureSchedule($schedule.data).length > 0}
-					<div>{futureSchedule($schedule.data)[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, futureSchedule($schedule.data)[0].node.location.timezone)}</time></div>
+					{#if futureSchedule.length > 0}
+						{#if futureSchedule[0].node.location }
+							<div>{futureSchedule[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, futureSchedule[0].node.location.timezone)}</time></div>
+						{/if}
 					{:else}
-					<div>{pastSchedule($schedule.data)[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, pastSchedule($schedule.data)[0].node.location.timezone)}</time></div>
+						{#if pastSchedule[0].node.location }
+						<div>{pastSchedule[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, pastSchedule[0].node.location.timezone)}</time></div>
+						{/if}
 					{/if}
 				</div>
-				{#if futureSchedule($schedule.data).length > 0}
+				{#if futureSchedule.length > 0}
 				<ul>
-					{#each Object.entries(Object.groupBy(futureSchedule($schedule.data), getDate)) as [date, items]}
+					{#each Object.entries(Object.groupBy(futureSchedule, getDate)) as [date, items]}
 						<li class="date-group">
 							{#if date != "Today"}
 							<h3>{date}</h3>
@@ -144,13 +163,11 @@
 		</div>
 
 		<div>
-			{#if $schedule.fetching}
+			{#if schedule.length <= 0}
 				<p>Loading...</p>
-			{:else if $schedule.error}
-				<p>Oh no... {$schedule.error.message}</p>
 			{:else}
 				<ul>
-					{#each Object.entries(Object.groupBy( pastSchedule($schedule.data), getDate )) as [date, items]}
+					{#each Object.entries(Object.groupBy( pastSchedule, getDate )) as [date, items]}
 						<li class="date-group">
 							{#if date != "Today"}
 							<h3 class="date-heading">{date}</h3>
@@ -166,6 +183,15 @@
 					{/each}
 				</ul>
 			{/if}
+
+			<div class="end-container">
+				{#if !endOfSchedule}
+				<button class="end" onclick={(e) => {offset = offset + limit; addScheduieItems();}}>Load more</button>
+				{:else}
+				<p class="end">End of schedule</p>
+				{/if}
+			</div>
+			
 		</div>
 
 		<div class="sidebar">
@@ -234,6 +260,15 @@
 		width: 100%;
 		max-width: 300px;
   		flex-shrink: 0;
+	}
+
+	.end-container {
+		display: flex;
+	}
+	.end {
+		width: fit-content;
+		padding: 0.25em;
+		margin-inline: auto;
 	}
 
 	.background-map {

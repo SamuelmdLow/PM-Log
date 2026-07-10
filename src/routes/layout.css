@@ -48,7 +48,7 @@
 body {
 	min-height: 100vh;
 	margin: 0;
-	border: 1em solid var(--color-theme-1);
+	border-block: 1em solid var(--color-theme-1);
 	background-attachment: fixed;
 	background-color: var(--color-bg-1);
 	background-size: 100vw 100vh;

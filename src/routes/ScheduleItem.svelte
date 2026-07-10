@@ -5,7 +5,9 @@
     let { node, selectedCoordinate = $bindable() } = $props();
 
     function setLocation(location: any) {
-        selectedCoordinate = [location.longitude*-1, location.latitude*-1];
+        if (location) {
+            selectedCoordinate = [location.longitude*-1, location.latitude*-1];
+        }
     }
 
 </script>
@@ -13,7 +15,9 @@
 <div class="schedule-item" onmouseover={(e: FocusEvent) => setLocation(node.location)}>
     <h4>
         <time datetime={node.datetime}>{timeString(node.datetime, $now)}</time> <a href={node.source}>{node.content}</a>
+        {#if node.location}
         <button class="location" onclick={(e: MouseEvent) => setLocation(node.location)}>{node.location.name}</button>
+        {/if}
     </h4>
     {#if node.attachments.edges.length > 0}
     <ul>
