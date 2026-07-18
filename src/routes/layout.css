@@ -11,12 +11,12 @@
 
 @font-face {
 	font-family: "Roboto";
-	src: url('fonts/Roboto/Roboto-VariableFont_wdth,wght.ttf');
+	src: url('fonts/Roboto/Roboto-VariableFont_wdth_wght.ttf');
 	font-style: normal;
 }
 @font-face {
 	font-family: "Roboto";
-	src: url('fonts/Roboto/Roboto-Italic-VariableFont_wdth,wght.ttf');
+	src: url('fonts/Roboto/Roboto-Italic-VariableFont_wdth_wght.ttf');
 	font-style: italic;
 }
 
