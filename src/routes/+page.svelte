@@ -30,6 +30,7 @@
 										title
 										content
 										source
+										json
 									}
 								}
 							}

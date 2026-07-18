@@ -1,6 +1,7 @@
 <script lang="ts">
     import { timeString } from '../lib/utils.ts';
     import {now} from "../lib/time.js";
+    import Attachment from './Attachment.svelte';
     
     let { node, selectedCoordinate = $bindable() } = $props();
 
@@ -22,9 +23,7 @@
     {#if node.attachments.edges.length > 0}
     <ul>
         {#each node.attachments.edges as attachment}
-        <li class="attachment">
-            <a href={attachment.node.source}>{attachment.node.title}</a>
-        </li>
+            <Attachment attachment={attachment} />
         {/each}
     </ul>
     {/if}
@@ -32,7 +31,7 @@
 
 <style>
 .schedule-item {
-    margin-bottom: 1rem;
+    margin-block: 1.5rem;
 }
 
 time {
@@ -51,6 +50,8 @@ time {
 }
 
 h4 {
+    margin: 0;
+    margin-bottom: 1rem;
     font-weight: 500;
     padding-inline: 1.5rem;
     color: var(--color-text-100)
