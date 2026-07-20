@@ -206,8 +206,8 @@
 		text-align: center;
 		letter-spacing: 0.25em;
 		.title-upper {
-			font-size: 1.5em;
 			display: block;
+			font-size: 1.5em;
 			font-family: "Instrument Serif", serif;
 			font-weight: 100;
 			line-height: 0.25rem;
@@ -290,5 +290,19 @@
 		width: 100%;
 		mask-mode: alpha;
 		mask-image: radial-gradient(closest-corner at 66% 33%,black,rgba(0,0,0,0.1));
+	}
+
+	@media screen and (max-width: 780px) {
+		h1 {
+			.title-upper {
+				font-size: 0.75em;
+			}
+			.title-lower {
+				font-size: 1.5em;
+			}
+		}
+		.container {
+			flex-direction: column;
+		}
 	}
 </style>

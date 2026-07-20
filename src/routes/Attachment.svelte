@@ -1,4 +1,5 @@
 <script lang="ts">    
+    import M3UVideo from "./M3UVideo.svelte";
     let { attachment } = $props();
 
     let json = $derived(JSON.parse(attachment.node.json));
@@ -8,6 +9,7 @@
     <a href={attachment.node.source} title={attachment.node.title}>
         <img src={json["video_poster"]} alt={attachment.node.title}/>
     </a>
+    <!-- <M3UVideo video_json={json} /> -->
     <div class="attachment_link">
         <a href={attachment.node.source}>{attachment.node.title}</a>
     </div>
