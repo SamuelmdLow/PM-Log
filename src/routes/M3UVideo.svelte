@@ -2,9 +2,11 @@
     import { onMount } from 'svelte';
     import Hls from 'hls.js';
     let { video_json } = $props();
+    let loaded = false;
 
     let video; 
-    onMount(() => {
+
+    function loadVideo() {
         const videoSrc = video_json["video_m3u8"] + ".m3u8";
         if (Hls.isSupported()) {
             var hls = new Hls();
@@ -20,10 +22,21 @@
             // of the plain video element, without using HLS.js.
             video.src = videoSrc;
         }
+    }
+
+    onMount(() => {
+        video.addEventListener("play", () => {
+            if (!loaded) {
+                loadVideo();
+                loaded=true;
+            }
+        })
     })
 </script>
 
-<video bind:this={video} poster={video_json['video_poster']} controls> </video>
+<div class="video-wrapper">
+    <video bind:this={video} poster={video_json['video_poster']} controls> </video>
+</div>
 
 <style>
 	video {
@@ -31,4 +44,13 @@
 		display: block;
 		width: 100%;
 	}
+    .video-wrapper {
+        position: relative;
+    }
+    button {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
 </style>
