@@ -49,6 +49,7 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		text-align: center;
 		padding: 12px;
 	}
 
@@ -59,6 +60,12 @@
 	@media (min-width: 480px) {
 		footer {
 			padding: 12px 0;
+		}
+	}
+
+	@media (max-width: 780px) {
+		main {
+			padding: 1rem 0;
 		}
 	}
 </style>

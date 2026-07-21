@@ -125,7 +125,7 @@
 	<div class="container">
 		<div class="sidebar">
 			{#if schedule.length <= 0}
-				<p>Loading...</p>
+				<p class="loader">Loading...</p>
 			{:else}
 				<h2 class="visually-hidden">Future</h2>
 				<div>
@@ -158,14 +158,14 @@
 					{/each}
 				</ul>
 				{:else}
-				<p>Nothing on schedule...</p>
+				<p>No schedule available.</p>
 				{/if}
 			{/if}
 		</div>
 
 		<div>
 			{#if schedule.length <= 0}
-				<p>Loading...</p>
+				<p class="loader">Loading...</p>
 			{:else}
 				<ul>
 					{#each Object.entries(Object.groupBy( pastSchedule, getDate )) as [date, items]}
@@ -258,8 +258,6 @@
 	}
 
 	.sidebar {
-		width: 100%;
-		max-width: 300px;
   		flex-shrink: 0;
 	}
 
@@ -292,6 +290,19 @@
 		mask-image: radial-gradient(closest-corner at 66% 33%,black,rgba(0,0,0,0.1));
 	}
 
+	.loader {
+		text-align: center;
+		width: fit-content;
+		margin: auto;
+	}
+
+	@media screen and (min-width: 781px) {
+		.sidebar {
+			width: 100%;
+			max-width: 300px;
+		}
+	}
+
 	@media screen and (max-width: 780px) {
 		h1 {
 			.title-upper {
@@ -303,6 +314,12 @@
 		}
 		.container {
 			flex-direction: column;
+		}
+		.sidebar {
+			padding: 1.5rem;
+		}
+		.local-time-header {
+			font-size: 1.5em;
 		}
 	}
 </style>

@@ -49,6 +49,17 @@ body {
 	min-height: 100vh;
 	margin: 0;
 	border-block: 1em solid var(--color-theme-1);
+}
+
+body::before {
+	position: fixed;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	z-index: -1;
+
+	content: "";
 	background-attachment: fixed;
 	background-repeat: no-repeat;
 	background-color: var(--color-bg-1);

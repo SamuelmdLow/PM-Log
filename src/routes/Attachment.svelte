@@ -6,10 +6,12 @@
 </script>
 
 <li class="attachment">
+    <!-- 
     <a href={attachment.node.source} title={attachment.node.title}>
         <img src={json["video_poster"]} alt={attachment.node.title}/>
     </a>
-    <!-- <M3UVideo video_json={json} /> -->
+    --> 
+    <M3UVideo video_json={json} />
     <div class="attachment_link">
         <a href={attachment.node.source}>{attachment.node.title}</a>
     </div>
