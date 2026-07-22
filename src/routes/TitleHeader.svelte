@@ -1,5 +1,9 @@
+<script lang="ts">
+	import { base } from '$app/paths';
+</script>
+
 <h1>
-    <a href="/">
+    <a href="{base}/">
     <span class="title-upper">The Illuminated</span>
     <span class="title-lower">PM LOG</span>
     </a>
