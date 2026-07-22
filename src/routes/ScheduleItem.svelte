@@ -23,7 +23,7 @@
     {#if node.attachments.edges.length > 0}
     <ul>
         {#each node.attachments.edges as attachment}
-            <Attachment attachment={attachment} />
+            <Attachment attachment={attachment.node} />
         {/each}
     </ul>
     {/if}

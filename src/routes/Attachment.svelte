@@ -2,7 +2,7 @@
     import M3UVideo from "./M3UVideo.svelte";
     let { attachment } = $props();
 
-    let json = $derived(JSON.parse(attachment.node.json));
+    let json = $derived(JSON.parse(attachment.json));
 </script>
 
 <li class="attachment">
@@ -13,7 +13,7 @@
     --> 
     <M3UVideo video_json={json} />
     <div class="attachment_link">
-        <a href={attachment.node.source}>{attachment.node.title}</a>
+        <a href={attachment.source}>{attachment.title}</a>
     </div>
 </li>
 

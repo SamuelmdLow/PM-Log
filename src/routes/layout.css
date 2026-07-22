@@ -36,6 +36,8 @@
 	--color-text-300: rgba(0, 0, 0, 0.5);
 
 	--color-border: rgba(0, 0, 0, 0.1);
+
+	--translucent: rgba(255,255,255,0.2);
 	
 	--column-width: 42rem;
 	--column-margin-top: 4rem;
@@ -97,4 +99,11 @@ button {
 	border: none;
 	border-radius: 0;
 	cursor: pointer;
+	font-size: 1em;
+}
+
+.loader {
+	text-align: center;
+	width: fit-content;
+	margin: auto;
 }

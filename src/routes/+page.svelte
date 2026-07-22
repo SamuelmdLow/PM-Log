@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { now } from '../lib/time.js';
 	import { getContextClient } from '@urql/svelte';
+	import TitleHeader from './TitleHeader.svelte';
 	import ScheduleItem from './ScheduleItem.svelte';
 	import UpcomingScheduleItem from './UpcomingScheduleItem.svelte';
 	import Globe from './Globe.svelte';
+	import SearchBox from './search/SearchBox.svelte';
 
 	let selectedCoordinate = $state([79.3839347, -43.6534817]);
 
@@ -103,8 +105,8 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>PM LOG</title>
+	<meta name="description" content="Activities of Canadian Prime Minister Mark Carney." />
 </svelte:head>
 
 <section>
@@ -117,13 +119,12 @@
 		</div>
 	</div>
 
-	<h1>
-		<span class="title-upper">The Illuminated</span>
-		<span class="title-lower">PM LOG</span>
-	</h1>
+	<TitleHeader />
 
 	<div class="container">
 		<div class="sidebar">
+			<SearchBox newSearch={""} display={"small"} />
+
 			{#if schedule.length <= 0}
 				<p class="loader">Loading...</p>
 			{:else}
@@ -200,27 +201,7 @@
 	</div>
 </section>
 
-<style>
-	h1 {
-		margin-bottom: 0;
-		text-align: center;
-		letter-spacing: 0.25em;
-		.title-upper {
-			display: block;
-			font-size: 1.5em;
-			font-family: "Instrument Serif", serif;
-			font-weight: 100;
-			line-height: 0.25rem;
-			color: var(--color-text-200);
-		}
-		.title-lower {
-			font-size: 3em;
-			font-family: "Roboto", sans-serif;
-			font-weight: 800;
-			color: var(--color-text-100);
-		}
-	}
-	
+<style>	
 	.container {
 		margin-inline: auto;
 		display: flex;
@@ -290,12 +271,6 @@
 		mask-image: radial-gradient(closest-corner at 66% 33%,black,rgba(0,0,0,0.1));
 	}
 
-	.loader {
-		text-align: center;
-		width: fit-content;
-		margin: auto;
-	}
-
 	@media screen and (min-width: 781px) {
 		.sidebar {
 			width: 100%;
@@ -304,14 +279,6 @@
 	}
 
 	@media screen and (max-width: 780px) {
-		h1 {
-			.title-upper {
-				font-size: 0.75em;
-			}
-			.title-lower {
-				font-size: 1.5em;
-			}
-		}
 		.container {
 			flex-direction: column;
 		}

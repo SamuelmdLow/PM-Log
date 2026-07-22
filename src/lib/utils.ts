@@ -14,3 +14,14 @@ export function timeString(datetime: string, now: Date) {
     } 
     return new Intl.DateTimeFormat('en-US', {  timeStyle: "short", }).format(date).toLowerCase() + ".";
 }
+
+export function dateString(datetime: string) {
+    const date = new Date(datetime);
+    const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    } as Intl.DateTimeFormatOptions;
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+}
