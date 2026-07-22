@@ -37,7 +37,7 @@
 </script>
 
 <div class={"search-box " + display}>
-<form action="/search/">
+<form action="search/">
     <input type="search" name='q' bind:value={newSearch} placeholder={placeholder} />
     <button>Search</button>
 </form>
