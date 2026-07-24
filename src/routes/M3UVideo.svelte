@@ -39,7 +39,7 @@
 </script>
 
 <div class="video-wrapper">
-    <video bind:this={video} poster={video_json['video_poster']} controls> </video>
+    <video bind:this={video} poster={video_json['video_poster']} controls playsinline> </video>
 </div>
 
 <style>

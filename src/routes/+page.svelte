@@ -6,11 +6,13 @@
 	import UpcomingScheduleItem from './UpcomingScheduleItem.svelte';
 	import Globe from './Globe.svelte';
 	import SearchBox from './search/SearchBox.svelte';
+	import Loader from './Loader.svelte';
 
 	let selectedCoordinate = $state([79.3839347, -43.6534817]);
 
 	let limit = 100;
 	let offset = $state(0);
+	let loading = $state(true);
 
 	const QUERY = `
 			query MyQuery($limit: Int!, $offset: Int!) {
@@ -47,11 +49,13 @@
 
 	const client = getContextClient();
 	function addScheduieItems() {
+		loading = true;
 		client
 			.query(QUERY, {limit, offset})
 			.toPromise()
 			.then(result => {
 				const newItems = result.data.allScheduleItems.edges;
+				loading = false;
 				if (newItems.length > 0) {
 					schedule = schedule.concat(result.data.allScheduleItems.edges);
 				} else {
@@ -126,7 +130,7 @@
 			<SearchBox newSearch={""} display={"small"} />
 
 			{#if schedule.length <= 0}
-				<p class="loader">Loading...</p>
+				<Loader />
 			{:else}
 				<h2 class="visually-hidden">Future</h2>
 				<div>
@@ -165,9 +169,7 @@
 		</div>
 
 		<div>
-			{#if schedule.length <= 0}
-				<p class="loader">Loading...</p>
-			{:else}
+			{#if schedule.length > 0}
 				<ul>
 					{#each Object.entries(Object.groupBy( pastSchedule, getDate )) as [date, items]}
 						<li class="date-group">
@@ -186,6 +188,9 @@
 				</ul>
 			{/if}
 
+			{#if loading}
+				<Loader />
+			{:else}
 			<div class="end-container">
 				{#if !endOfSchedule}
 				<button class="end" onclick={(e) => {offset = offset + limit; addScheduieItems();}}>Load more</button>
@@ -193,6 +198,7 @@
 				<p class="end">End of schedule</p>
 				{/if}
 			</div>
+			{/if}
 			
 		</div>
 

@@ -3,6 +3,8 @@
     import { base } from '$app/paths';
     let {newSearch=$bindable(), display} = $props();
     let placeholder = $state("");
+    let input;
+    let focused = $state(false);
 
     const placeholders = [
         'Alberta Separtism?',
@@ -12,6 +14,7 @@
         'Heated Rivalry?',
         'Davos speech?',
         'Giving up on climate?',
+        'Free trade agreements?',
     ];
 
     function setPlaceholder(i:number, direction: number) {
@@ -39,13 +42,15 @@
 
     onMount(() => {
         setPlaceholder(0, 1);
+        input.addEventListener("focus", () => focused = true);
+        input.addEventListener("focusout", () => focused = false);
     })
 
 </script>
 
 <div class={"search-box " + display}>
 <form action="{base}/search/">
-    <input type="search" name='q' bind:value={newSearch} placeholder={placeholder} />
+    <input type="search" name='q' bind:this={input} bind:value={newSearch} placeholder={focused ? "Search something..." : placeholder} />
     <button>Search</button>
 </form>
 </div>

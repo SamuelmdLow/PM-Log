@@ -51,24 +51,7 @@ body {
 	min-height: 100vh;
 	margin: 0;
 	border-block: 1em solid var(--color-theme-1);
-}
-
-body::before {
-	position: fixed;
-	top:0;
-	left:0;
-	right:0;
-	height: 100vh;
-	z-index: -1;
-
-	content: "";
-	background-attachment: fixed;
-	background-repeat: no-repeat;
-	background-color: var(--color-bg-1);
-	background-size: 100vw 100vh;
-	background-image:
-		radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 100%),
-		linear-gradient(180deg, var(--color-bg-0) 0%, var(--color-bg-1) 15%, var(--color-bg-2) 50%);
+	background: var(--color-bg-1);
 }
 
 ul {

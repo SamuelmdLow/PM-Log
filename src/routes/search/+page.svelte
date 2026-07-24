@@ -5,6 +5,7 @@
     import TitleHeader from '../TitleHeader.svelte';
     import AttachmentResult from './AttachmentResult.svelte';
     import SearchBox from './SearchBox.svelte';
+    import Loader from '../Loader.svelte';
 
     let loading = $state(false);
     let error = $state(false);
@@ -87,15 +88,13 @@
     <SearchBox bind:newSearch={newSearch} display={"central"}/>
 
     <div class="container">
-        {#if search == ""}
-            <div class="loader">Search something</div>
-        {:else if loading}
-            <div class="loader">Loading...</div>
+        {#if loading}
+            <Loader />
         {:else if error}
             <div class="loader">Error making request.</div>
-        {:else if search_response.length == 0}
+        {:else if search_response.length == 0 && search !== ""}
             <div class="loader">No results.</div>
-        {:else}
+        {:else if search !== ""}
             {#each search_response as attachment}
                 <AttachmentResult attachment={attachment.node} />
             {/each}
