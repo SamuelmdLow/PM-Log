@@ -31,14 +31,7 @@
 
     const client = getContextClient();
 
-    function readQuery(searchParams:URLSearchParams) {
-        if (page.url.searchParams.has('q')) {
-            return decodeURI(searchParams.get('q'));
-        }
-        return '';
-    }
-
-    let search = $derived(readQuery(page.url.searchParams));
+    let search = $state("");
     let newSearch = $state("");
     let limit = 10;
     let offset = 0;
@@ -59,6 +52,15 @@
                 loading = false;
             });	
     }
+
+    
+    $effect(() => {
+        if (page.url.searchParams.has('q')) {
+            search = decodeURI(page.url.searchParams.get('q'));
+        } else {
+            search = "";
+        }
+    })
 
     $effect(() => {
         newSearch = search;
