@@ -7,17 +7,24 @@
     import SearchBox from './SearchBox.svelte';
 
     let loading = $state(false);
+    let error = $state(false);
     let search_response = $state([]);
+    let endOfResults = $state(false);
 
 	const SEARCH_QUERY = `
-		query MyQuery($search: String!) {
-			attachmentsSemanticSearch(query: $search) {
-				content
-				id
-				json
-				publishedAt
-				source
-				title
+		query MyQuery($search: String!, $limit: Int!, $offset: Int!) {
+			attachmentsSemanticSearch(query: $search, first: $limit, offset: $offset) {
+                edges {
+                    node {
+                        id
+                        title
+                        content
+                        json
+                        publishedAt
+                        source
+                        scoredContent(query: $search)
+                    }
+                }
 			}
 		}
 	`;
@@ -32,19 +39,36 @@
     }
 
     let search = $derived(readQuery(page.url.searchParams));
-    let newSearch = $state("")
+    let newSearch = $state("");
+    let limit = 10;
+    let offset = 0;
+
+    function addSearchResult() {
+        client
+            .query(SEARCH_QUERY, {search, limit, offset})
+            .toPromise()
+            .then(result => {
+                if (result.data.attachmentsSemanticSearch.edges.length < limit ) {
+                    endOfResults = true;
+                }
+                search_response = search_response.concat(result.data.attachmentsSemanticSearch.edges);
+                console.log(search_response);
+                loading = false;
+            }).catch(reason => {
+                error = true;
+                loading = false;
+            });	
+    }
+
     $effect(() => {
         newSearch = search;
+        endOfResults = false;
+        search_response = [];
+        loading = false;
         if (search != "") {
             loading = true;
-            client
-                .query(SEARCH_QUERY, {search})
-                .toPromise()
-                .then(result => {
-                    search_response = result.data.attachmentsSemanticSearch;
-                    console.log(search_response);
-                    loading = false;
-                });	
+            error = false;
+            addSearchResult()
         }
     })
 
@@ -61,14 +85,25 @@
     <SearchBox bind:newSearch={newSearch} display={"central"}/>
 
     <div class="container">
-        {#if loading}
+        {#if search == ""}
+            <div class="loader">Search something</div>
+        {:else if loading}
             <div class="loader">Loading...</div>
+        {:else if error}
+            <div class="loader">Error making request.</div>
         {:else if search_response.length == 0}
             <div class="loader">No results.</div>
         {:else}
             {#each search_response as attachment}
-                <AttachmentResult attachment={attachment} />
+                <AttachmentResult attachment={attachment.node} />
             {/each}
+
+			<div class="end-container">
+				{#if !endOfResults}
+                <button onclick={() => {offset = offset + limit; addSearchResult()}} class="end">Load more</button>
+				{/if}
+			</div>
+
         {/if}
     </div>
 </section>

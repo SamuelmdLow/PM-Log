@@ -107,3 +107,21 @@ button {
 	width: fit-content;
 	margin: auto;
 }
+
+.end-container {
+	margin-top: 1em;
+	display: flex;
+}
+.end {
+	width: fit-content;
+	padding: 0.25em;
+	margin-inline: auto;
+}
+
+.current-word {
+	text-shadow: 0 0 2px var(--color-text-300);
+}
+
+mark.highlight .current-word {
+	text-shadow: 0 0 1px white;
+}

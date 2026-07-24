@@ -242,15 +242,6 @@
   		flex-shrink: 0;
 	}
 
-	.end-container {
-		display: flex;
-	}
-	.end {
-		width: fit-content;
-		padding: 0.25em;
-		margin-inline: auto;
-	}
-
 	.background-map {
 		position: sticky;
 		top: 0;
@@ -271,15 +262,16 @@
 		mask-image: radial-gradient(closest-corner at 66% 33%,black,rgba(0,0,0,0.1));
 	}
 
-	@media screen and (min-width: 781px) {
+	@media screen and (min-width: 1000px) {
 		.sidebar {
 			width: 100%;
-			max-width: 300px;
+			max-width: min(300px, 30%);
 		}
 	}
 
-	@media screen and (max-width: 780px) {
+	@media screen and (max-width: 1000px) {
 		.container {
+			max-width: 750px;
 			flex-direction: column;
 		}
 		.sidebar {

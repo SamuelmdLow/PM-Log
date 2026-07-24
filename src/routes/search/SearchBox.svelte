@@ -1,22 +1,27 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { base } from '$app/paths';
     let {newSearch=$bindable(), display} = $props();
     let placeholder = $state("");
 
     const placeholders = [
-        'Alberta Separtism',
-        'Defence spending',
-        'FIFA World Cup',
-        'Variable geometry',
-        'Heated Rivalry',
+        'Alberta Separtism?',
+        'Defence spending?',
+        'FIFA World Cup?',
+        'Variable geometry?',
+        'Heated Rivalry?',
+        'Davos speech?',
+        'Giving up on climate?',
     ];
 
-    function setPlaceholder(i:number) {
+    function setPlaceholder(i:number, direction: number) {
         const interval = setInterval(() => {
-            console.log(placeholder);
-            if (placeholder.length < placeholders[i].length) {
-                placeholder = placeholders[i].substring(0, placeholder.length + 1);
-            } else if (placeholder.length == placeholders[i].length) {
+            if (placeholder.length == placeholders[i].length && direction > 0) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    setPlaceholder(i, -1);
+                }, 7500);
+            } else if (placeholder.length == 0 && direction < 0) {
                 clearInterval(interval);
                 setTimeout(() => {
                     placeholder = "";
@@ -24,20 +29,22 @@
                     if (i >= placeholders.length) {
                         i = 0;
                     }
-                    setPlaceholder(i);
-                }, 5000);
+                    setPlaceholder(i, 1);
+                }, 100);
+            } else {
+                placeholder = placeholders[i].substring(0, placeholder.length + direction);
             }
         }, 100);
     }
 
     onMount(() => {
-        setPlaceholder(0);
+        setPlaceholder(0, 1);
     })
 
 </script>
 
 <div class={"search-box " + display}>
-<form action="search/">
+<form action="{base}/search/">
     <input type="search" name='q' bind:value={newSearch} placeholder={placeholder} />
     <button>Search</button>
 </form>
@@ -77,5 +84,10 @@
     .central input {
         text-align: center;
         font-size: 1.25em;
+    }
+    @media screen and (max-width: 1000px) {
+        input {
+            text-align: center;
+        }
     }
 </style>

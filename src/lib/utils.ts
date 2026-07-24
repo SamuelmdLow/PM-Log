@@ -25,3 +25,16 @@ export function dateString(datetime: string) {
     } as Intl.DateTimeFormatOptions;
     return new Intl.DateTimeFormat('en-US', options).format(date);
 }
+
+export function durationString(duration: number) {
+    const hours = Math.floor(duration / (60*60));
+    const minutes = Math.floor((duration % (60*60)) / 60);
+    const seconds =  Math.floor(duration % 60);
+
+    let string = "";
+    if (hours > 0) {
+        string = string + String(hours) + ":";
+    }
+    string = string + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    return string;
+}

@@ -1,10 +1,14 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Hls from 'hls.js';
-    let { video_json } = $props();
+    let { video=$bindable(), video_json } = $props();
     let loaded = false;
 
-    let video; 
+    export function seek(time:number) {
+        console.log(time);
+        video.play();
+        video.currentTime = time;
+    }
 
     function loadVideo() {
         const videoSrc = video_json["video_m3u8"] + ".m3u8";
