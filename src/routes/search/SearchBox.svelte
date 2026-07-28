@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { base } from '$app/paths';
-    let {display} = $props();
+    let {search_value=$bindable(), display} = $props();
     let placeholder = $state("");
     let input;
     let focused = $state(false);
@@ -50,7 +50,7 @@
 
 <div class={"search-box " + display}>
 <form action="{base}/search/">
-    <input type="search" name='q' bind:this={input} placeholder={focused ? "Search something..." : placeholder} />
+    <input type="search" name='q' bind:this={input} bind:value={search_value} placeholder={focused ? "Search something..." : placeholder} />
     <button>Search</button>
 </form>
 </div>

@@ -8,6 +8,7 @@
     import Loader from '../Loader.svelte';
 
     let search = $state("");
+    let search_input = $derived(search);
     let search_response = $state([]);
 
     let loading = $state(true);
@@ -75,7 +76,6 @@
     $effect(() => {
         offset = 0;
         search_response = [];
-        console.log(search);
         addSearchResult(search);
     })
 
@@ -89,7 +89,7 @@
 <section>
 
     <TitleHeader />
-    <SearchBox display={"central"}/>
+    <SearchBox search_value={search_input} display={"central"}/>
 
     <div class="container">
         {#if error}
