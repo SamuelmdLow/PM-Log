@@ -7,7 +7,7 @@
     import SearchBox from './SearchBox.svelte';
     import Loader from '../Loader.svelte';
 
-    let search = $derived(getQuery(page.url.searchParams));
+    let search = $state("");
     let search_response = $state([]);
 
     let loading = $state(true);
@@ -55,6 +55,8 @@
                     error = true;
                     loading = false;
                 });	
+        } else {
+            loading = false;
         }
     }
 
@@ -65,6 +67,10 @@
         }
         return null;
     }
+
+    $effect(() => {
+        search = getQuery(page.url.searchParams);
+    })
 
     $effect(() => {
         offset = 0;
