@@ -7,10 +7,15 @@
     import SearchBox from './SearchBox.svelte';
     import Loader from '../Loader.svelte';
 
-    let loading = $state(false);
-    let error = $state(false);
+    let search = $derived(getQuery(page.url.searchParams));
     let search_response = $state([]);
+
+    let loading = $state(true);
+    let error = $state(false);
     let endOfResults = $state(false);
+    
+    let limit = 10;
+    let offset = 0;
 
 	const SEARCH_QUERY = `
 		query MyQuery($search: String!, $limit: Int!, $offset: Int!) {
@@ -32,67 +37,58 @@
 
     const client = getContextClient();
 
-    let search = $state("");
-    let newSearch = $state("");
-    let limit = 10;
-    let offset = 0;
-
-    function addSearchResult() {
-        client
-            .query(SEARCH_QUERY, {search, limit, offset})
-            .toPromise()
-            .then(result => {
-                if (result.data.attachmentsSemanticSearch.edges.length < limit ) {
-                    endOfResults = true;
-                }
-                search_response = search_response.concat(result.data.attachmentsSemanticSearch.edges);
-                console.log(search_response);
-                loading = false;
-            }).catch(reason => {
-                error = true;
-                loading = false;
-            });	
-    }
-
-    
-    $effect(() => {
-        if (page.url.searchParams.has('q')) {
-            search = decodeURI(page.url.searchParams.get('q'));
-        } else {
-            search = "";
-        }
-    })
-
-    $effect(() => {
-        newSearch = search;
-        endOfResults = false;
-        search_response = [];
-        loading = false;
-        if (search != "") {
+    function addSearchResult(query:string) {
+        if (query) {
             loading = true;
             error = false;
-            addSearchResult()
+            endOfResults = false;
+            client
+                .query(SEARCH_QUERY, {"search": query, "limit": limit, "offset": offset})
+                .toPromise()
+                .then(result => {
+                    if (result.data.attachmentsSemanticSearch.edges.length < limit ) {
+                        endOfResults = true;
+                    }
+                    search_response = search_response.concat(result.data.attachmentsSemanticSearch.edges);
+                    loading = false;
+                }).catch(reason => {
+                    error = true;
+                    loading = false;
+                });	
         }
+    }
+
+    function getQuery(searchParams:URLSearchParams) {
+        const q = searchParams.get('q');
+        if (q) {
+            return decodeURI(q);
+        }
+        return null;
+    }
+
+    $effect(() => {
+        offset = 0;
+        search_response = [];
+        console.log(search);
+        addSearchResult(search);
     })
 
 </script>
 
 <svelte:head>
-	<title>PM LOG - Search</title>
+	<title>{search} - PM Log</title>
 	<meta name="description" content="Activities of Canadian Prime Minister Mark Carney." />
 </svelte:head>
 
 <section>
 
     <TitleHeader />
-    <SearchBox bind:newSearch={newSearch} display={"central"}/>
+    <SearchBox display={"central"}/>
 
     <div class="container">
-        {#if loading}
-            <Loader />
-        {:else if error}
+        {#if error}
             <div class="loader">Error making request.</div>
-        {:else if search_response.length == 0 && search !== ""}
+        {:else if search_response.length == 0 && !loading}
             <div class="loader">No results.</div>
         {:else if search !== ""}
             {#each search_response as attachment}
@@ -100,11 +96,12 @@
             {/each}
 
 			<div class="end-container">
-				{#if !endOfResults}
-                <button onclick={() => {offset = offset + limit; addSearchResult()}} class="end">Load more</button>
-				{/if}
-			</div>
-
+                {#if loading}
+                    <Loader />
+                {:else if !endOfResults}
+                    <button onclick={() => {offset = offset + limit; addSearchResult(search)}} class="end">Load more</button>
+                {/if}
+            </div>
         {/if}
     </div>
 </section>

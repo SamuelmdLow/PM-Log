@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { base } from '$app/paths';
-    let {newSearch=$bindable(), display} = $props();
+    let {display} = $props();
     let placeholder = $state("");
     let input;
     let focused = $state(false);
@@ -13,7 +13,7 @@
         'Variable geometry?',
         'Heated Rivalry?',
         'Davos speech?',
-        'Giving up on climate?',
+        'Rolling back climate policies?',
         'Free trade agreements?',
     ];
 
@@ -50,7 +50,7 @@
 
 <div class={"search-box " + display}>
 <form action="{base}/search/">
-    <input type="search" name='q' bind:this={input} bind:value={newSearch} placeholder={focused ? "Search something..." : placeholder} />
+    <input type="search" name='q' bind:this={input} placeholder={focused ? "Search something..." : placeholder} />
     <button>Search</button>
 </form>
 </div>
@@ -87,12 +87,6 @@
         }
     }
     .central input {
-        text-align: center;
         font-size: 1.25em;
-    }
-    @media screen and (max-width: 1000px) {
-        input {
-            text-align: center;
-        }
     }
 </style>

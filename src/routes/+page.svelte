@@ -8,6 +8,8 @@
 	import SearchBox from './search/SearchBox.svelte';
 	import Loader from './Loader.svelte';
 
+	let windowWidth = $state(0);
+
 	let selectedCoordinate = $state([79.3839347, -43.6534817]);
 
 	let limit = 100;
@@ -109,12 +111,15 @@
 </script>
 
 <svelte:head>
-	<title>PM LOG</title>
+	<title>PM Log</title>
 	<meta name="description" content="Activities of Canadian Prime Minister Mark Carney." />
 </svelte:head>
 
+<svelte:window bind:innerWidth={windowWidth} />
+
 <section>
 
+	{#if windowWidth > 1000}
 	<div class="background-map">
 		<div class="globe-container">
 			<div class="globe-wrapper">
@@ -122,16 +127,15 @@
 			</div>
 		</div>
 	</div>
+	{/if}
 
 	<TitleHeader />
 
 	<div class="container">
 		<div class="sidebar">
-			<SearchBox newSearch={""} display={"small"} />
+			<SearchBox display={"small"} />
 
-			{#if schedule.length <= 0}
-				<Loader />
-			{:else}
+			{#if schedule.length > 0}
 				<h2 class="visually-hidden">Future</h2>
 				<div>
 					<div class="local-time-header"><time datetime={$now.toLocaleTimeString()}>{dateFormat($now, null)}</time></div>
@@ -257,7 +261,7 @@
 	.globe-container {
 		position: absolute;
 		right: 0;
-		max-width: 75vw;
+		max-width: 50vw;
 		height: 100vh;
 		width: auto;
 		aspect-ratio: 1;
