@@ -10,8 +10,10 @@
     <a href={attachment.node.source} title={attachment.node.title}>
         <img src={json["video_poster"]} alt={attachment.node.title}/>
     </a>
-    --> 
-    <M3UVideo video_json={json} />
+    -->
+    {#if json["video_m3u8"]}
+        <M3UVideo video_json={json} />
+    {/if}
     <div class="attachment_link">
         <a href={attachment.source}>{attachment.title}</a>
     </div>

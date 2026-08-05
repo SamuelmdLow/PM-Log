@@ -108,3 +108,12 @@ button {
 mark.highlight .current-word {
 	text-shadow: 0 0 1px white;
 }
+
+.transcript-container .marked {
+	--border-colour: rgb(255, 0,0, var(--score));
+	--highlight-colour: rgb(255, 0,0, calc(0.25 * var(--score)));
+
+	padding-left: 0.5em;
+	border-left: 0.25em solid var(--border-colour);
+	background-color: var(--highlight-colour);
+}
