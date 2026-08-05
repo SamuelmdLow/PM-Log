@@ -117,3 +117,7 @@ mark.highlight .current-word {
 	border-left: 0.25em solid var(--border-colour);
 	background-color: var(--highlight-colour);
 }
+
+.transcript-container a {
+	text-decoration: underline;
+}

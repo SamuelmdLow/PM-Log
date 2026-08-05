@@ -16,12 +16,12 @@
 
     function wrapInnerWithMark(html, score) {
         const elems = ["p", "h1", "h2", "h3", "h4", "li"];
-        let attributes = " style='--score: " + String(score) + "'";
+
         let classList = "marked";
         if (score > 0.45) {
             classList = classList + " higlight"; 
-            attributes = attributes + " class='" + classList + "'";
         }
+        let attributes = " style='--score: " + String(score) + "' class='" + classList + "'";
         for (const elem of elems) {
             html = html.replaceAll("<" + elem + ">", "<" + elem + attributes + ">");
         }
