@@ -96,10 +96,9 @@
         position: relative;
     }
     .transcript-line mark {
-        background-color: rgb(255, 0,0, var(--score));
-    }
-    .transcript-line mark.highlight {
-        color: rgba(255,255,255,0.9);
+        background-color: rgb(255, 0,0, calc(0.5* var(--score)));
+        border-left: 0.25em solid rgb(255, 0,0, var(--score));
+        padding-left: 0.25em;
     }
     .transcript-line-time-button {
         font-size: 0.75em;
