@@ -1,6 +1,7 @@
 <script lang="ts">
     // https://www.d3indepth.com/geographic/
-    import { geoPath, geoOrthographic, geoGraticule } from 'd3-geo';
+    import { getContextClient } from '@urql/svelte';
+    import { geoPath, geoOrthographic, geoGraticule, geoDistance } from 'd3-geo';
     import { onMount } from 'svelte';
     import { select } from 'd3';
     import { zoom, zoomTransform, zoomIdentity } from 'd3-zoom';
@@ -8,7 +9,47 @@
     let {focus = $bindable()} = $props();
     let rotation = $state(focus);
 
+    const width = 800;
+    const height = 600;
+
+    let locations = [];
+
+    const QUERY = `query MyQuery($limit: Int!, $offset: Int!) {
+        allLocations(first: $limit, offset: $offset) {
+            edges {
+            node {
+                latitude
+                longitude
+                name
+            }
+            }
+            pageInfo {
+            hasNextPage
+            }
+        }
+        }`
+
+    const client = getContextClient();
+    const limit = 100;
+
+    function addLocations(offset) {
+        client
+            .query(QUERY, {limit, offset})
+            .toPromise()
+            .then(result => {
+                const newItems = result.data.allLocations.edges;
+                if (newItems.length > 0) {
+                    locations = locations.concat(newItems);
+
+                    if (result.data.allLocations.pageInfo.hasNextPage) {
+                        addLocations(offset+limit);
+                    }
+                }
+            });
+    }
+    
     onMount(() => {
+        addLocations(0);
 
         const canvas = <HTMLCanvasElement> document.getElementById("canvas");
             
@@ -39,7 +80,7 @@
                 projection.rotate(rotation);
             }
 
-            context.clearRect(0, 0, 800, 600);
+            context.clearRect(0, 0, width, height);
 
             context.lineWidth = 0.5;
             context.strokeStyle = '#333';
@@ -47,6 +88,37 @@
             context.beginPath();
             geoGenerator({type: 'FeatureCollection', features: geojson.features});
             context.stroke();
+
+            let focusedLocations = [];
+
+            for (let location of locations) {
+   
+                let focusDist = geoDistance([location.node.longitude*-1, location.node.latitude*-1],focus);
+                if (focusDist != 0) {
+                    let cord = projection([location.node.longitude, location.node.latitude])
+
+                    let dist = geoDistance([location.node.longitude*-1, location.node.latitude*-1],rotation);
+                    let size = (1 * Math.max(Math.PI - dist, 0)) / Math.PI;
+                    let opacity = ((Math.PI*2) - dist)/ (Math.PI*2*3);
+   
+                    context.fillStyle = "rgba(111, 14, 30, " + String(opacity) + ")";
+                    context.beginPath();
+                    context.arc(cord[0], cord[1], size, 0, 2 * Math.PI);
+                    context.fill();
+                } else {
+                    focusedLocations.push(location);
+                }
+            }
+
+            for (let location of focusedLocations) {
+                let cord = projection([location.node.longitude, location.node.latitude])
+
+                context.fillStyle = "#ff0000";
+                context.beginPath();
+                context.arc(cord[0], cord[1], 2, 0, 2 * Math.PI);
+                context.fill();
+            }
+
 
             // Graticule
             let graticule = geoGraticule();
