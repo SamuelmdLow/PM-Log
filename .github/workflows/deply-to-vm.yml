@@ -27,9 +27,6 @@ jobs:
       - name: zip build
         run: tar -cvf build.tar build
 
-      - name: Send zip to VM
-        run: scp build.tar ${{ip}}:build.tar
-
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
@@ -46,6 +43,9 @@ jobs:
           SSH_USER: ${{ secrets.PRODUCTION_SSH_USER }}
           SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
           SSH_HOST: ${{ secrets.PRODUCTION_SSH_HOST }}
+
+      - name: Send zip to VM
+        run: scp build.tar production:build.tar
 
       - name: Move build
         run: ssh production "sudo mv build.tar ../../opt/pm_tracker"
