@@ -51,7 +51,10 @@ jobs:
         run: ssh production "sudo mv build.tar ../../opt/pm_tracker"
 
       - name: Unzip build
-        run: ssh production "sudo tar -xf build.tar frontend"
+        run: ssh production "sudo tar -xf /opt/pm_tracker/build.tar -C /opt/pm_tracker/frontend"
+
+      - name: Remove build zip
+        run: ssh production "sudo rm /opt/pm_tracker/build.tar"
 
       - name: Reload Nginx container
         run: ssh production "sudo docker compose exec nginx nginx -s reload"
