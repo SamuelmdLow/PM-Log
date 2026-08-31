@@ -7,6 +7,7 @@
     let focused = $state(false);
 
     const placeholders = [
+        'Canada-US Trade War?',
         'Alberta Separtism?',
         'Defence spending?',
         'FIFA World Cup?',
