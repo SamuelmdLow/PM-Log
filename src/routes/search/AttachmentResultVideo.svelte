@@ -10,11 +10,16 @@
     let videoElem;
     let transcriptElem;
 
+    function getTranscriptLineOffset(lineElem) {
+        return lineElem.parentNode.offsetTop + lineElem.offsetTop - 25;
+    }
+
     onMount(() => {
         if (videoElem && transcriptElem && transcriptElem.children.length > 0) {
             const i = scored_content.map(segment => segment.score).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+            const line = transcriptElem.getElementsByClassName('transcript-line')[i];
             videoElem.currentTime = scored_content[i].data.start;
-            transcriptElem.scrollTo(0, transcriptElem.getElementsByClassName('transcript-line')[i].offsetTop);
+            transcriptElem.scrollTo(0, getTranscriptLineOffset(line));
         }
 
         setInterval(() => {
@@ -23,8 +28,10 @@
 
                 if (!videoElem.paused) {
                     const i = scored_content.map(segment => segment.data.end).filter(ordering => ordering < videoElem.currentTime).length;
+                    
+                    const line = transcriptElem.getElementsByClassName('transcript-line')[i];
                     transcriptElem.scrollTo({
-                        top: transcriptElem.getElementsByClassName('transcript-line')[i].offsetTop - 20,
+                        top: getTranscriptLineOffset(line),
                         left: 0,
                         behavior: "smooth",
                         });
@@ -40,7 +47,6 @@
         let unidentified_voices = [];
         
         for (let segment of segments) {
-            console.log(segment);
             let segment_attribution = segment.attribution__name;
             if (segment_attribution == null) {
                 if (segment.voice_id == null) {
@@ -53,15 +59,12 @@
                 }
             }
             if (speaker == segment_attribution) {
-                console.log(groups);
-                console.log(speaker + ", "  + segment_attribution);
                 groups[groups.length-1].segments.push(segment);
             } else {
                 speaker = segment_attribution;
                 groups.push({"speaker": speaker, "segments": [segment]})
             }
         }
-        console.log(groups);
         return groups
     }
 

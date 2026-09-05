@@ -106,7 +106,8 @@ button {
 }
 
 mark.highlight .current-word {
-	text-shadow: 0 0 1px white;
+	text-shadow: 0 0 2px var(--color-theme-1);
+	color: black;
 }
 
 .transcript-container .marked {
