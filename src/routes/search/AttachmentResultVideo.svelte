@@ -14,7 +14,7 @@
         if (videoElem && transcriptElem && transcriptElem.children.length > 0) {
             const i = scored_content.map(segment => segment.score).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
             videoElem.currentTime = scored_content[i].data.start;
-            transcriptElem.scrollTo(0, transcriptElem.children[i].offsetTop);
+            transcriptElem.scrollTo(0, transcriptElem.getElementsByClassName('transcript-line')[i].offsetTop);
         }
 
         setInterval(() => {
@@ -24,7 +24,7 @@
                 if (!videoElem.paused) {
                     const i = scored_content.map(segment => segment.data.end).filter(ordering => ordering < videoElem.currentTime).length;
                     transcriptElem.scrollTo({
-                        top: transcriptElem.children[i].offsetTop,
+                        top: transcriptElem.getElementsByClassName('transcript-line')[i].offsetTop - 20,
                         left: 0,
                         behavior: "smooth",
                         });
@@ -33,6 +33,37 @@
 
         }, 10);
     })
+
+    function groupBySpeaker(segments) {
+        let speaker = null;
+        let groups = [];
+        let unidentified_voices = [];
+        
+        for (let segment of segments) {
+            console.log(segment);
+            let segment_attribution = segment.attribution__name;
+            if (segment_attribution == null) {
+                if (segment.voice_id == null) {
+                    segment_attribution = "No speaker diarization yet."    
+                } else {
+                    if (!unidentified_voices.includes(segment.voice_id)) {
+                        unidentified_voices.push(segment.voice_id)
+                    }
+                    segment_attribution = "Unidentified voice #" + String(unidentified_voices.indexOf(segment.voice_id) + 1);
+                }
+            }
+            if (speaker == segment_attribution) {
+                console.log(groups);
+                console.log(speaker + ", "  + segment_attribution);
+                groups[groups.length-1].segments.push(segment);
+            } else {
+                speaker = segment_attribution;
+                groups.push({"speaker": speaker, "segments": [segment]})
+            }
+        }
+        console.log(groups);
+        return groups
+    }
 
     function highlightWord(data, time) {
         let words = structuredClone(data.words);
@@ -59,17 +90,22 @@
     <div class="transcript-container">
         {#if scored_content.length > 0}
         <div bind:this={transcriptElem} class="transcript">
-            {#each scored_content as segment}
-            <p class="transcript-line" style={"--score: " + segment["score"]}>
-                <button class="transcript-line-time-button" onclick={video.seek(segment["data"]["start"])}>{durationString(segment["data"]["start"])}</button>
-                {#if segment["score"] >  0.25}
-                    <mark class={segment["score"] >  0.45 ? "highlight" : ""}>
+            {#each groupBySpeaker(scored_content) as speaker_segment}
+            <div class="speaker-group">
+                <div class="speaker-label">{speaker_segment.speaker}</div>
+                {#each speaker_segment.segments as segment}
+                <p class="transcript-line" style={"--score: " + segment["score"]}>
+                    <button class="transcript-line-time-button" onclick={video.seek(segment["data"]["start"])}>{durationString(segment["data"]["start"])}</button>
+                    {#if segment["score"] >  0.25}
+                        <mark class={segment["score"] >  0.45 ? "highlight" : ""}>
+                            {@html highlightWord(segment["data"], currentTime)}
+                        </mark>
+                    {:else}
                         {@html highlightWord(segment["data"], currentTime)}
-                    </mark>
-                {:else}
-                    {@html highlightWord(segment["data"], currentTime)}
-                {/if}
-            </p>
+                    {/if}
+                </p>
+                {/each}
+            </div>
             {/each}
         </div>
         {:else}
@@ -94,6 +130,23 @@
         width: 100%;
         clip-path: content-box;
         position: relative;
+    }
+    .speaker-label {
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        background: var(--color-bg-1);
+    }
+    .speaker-group {
+        position: relative;
+    }
+    .transcript-line + .speaker-label {
+        margin-top: 1em;
+    }
+    .transcript-line {
+        margin-left: 0.25em;
+        margin-block: 0.5em;
+        scroll-margin: 1em;
     }
     .transcript-line mark {
         background-color: rgb(255, 0,0, calc(0.5* var(--score)));
