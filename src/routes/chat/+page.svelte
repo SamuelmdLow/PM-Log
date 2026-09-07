@@ -1,10 +1,11 @@
 <script lang="ts">
     import TitleHeader from '../TitleHeader.svelte';
+    import ChatBubble from './ChatBubble.svelte';
     import { dateString } from '$lib/utils';
 
     let messages = $state([]);
     let query = $state("");
-    let loading = $state(false);
+    let loading = $state(0);
 
     function sendQuestion() {
         messages.push({
@@ -12,24 +13,21 @@
             'text': query
         })
         const api = "https://pmlog.ca/api/question/1/?q=" + encodeURI(query);
+        loading = loading + 1;
         query = "";
-        loading = true;
         fetch(api).then(response => response.json()).then(data => {
             if (data.length > 0) {
-                for (let answer of data) {
-                    messages.push({
-                        'sender': 'bot',
-                        'text':answer.passage,
-                        'attachment': answer.attachment,
+                messages.push({
+                    'sender': 'bot',
+                    'passages': data,
                     });
-                }
             } else {
                 messages.push({
                     'sender': 'bot',
                     'text': "idk.",
                 });
             }
-            loading = false;
+            loading = loading - 1;
         })
     }
 </script>
@@ -46,16 +44,9 @@
 
         <div class="messages">
             {#each messages as message}
-                <div class={"message " + message.sender}>
-                    {#if message.attachment}
-                    <div class="header">
-                    {dateString(message.attachment.published_at)} - <a href={message.attachment.source}>{message.attachment.title}</a>
-                    </div>
-                    {/if}
-                    {message.text}
-                </div>
+                <ChatBubble message={message} />
             {/each}
-            {#if loading}
+            {#if loading > 0}
                 <div class="message bot">Loading...</div>
             {/if}
         </div>
@@ -81,29 +72,6 @@
     .messages {
         margin-bottom: 5em;
         min-height: 50vh;
-    }
-    .message {
-        margin: 1em;
-        padding: 1em 0.5em;
-        position: relative;
-        border-radius: 1em;
-        max-width: 75%;
-        width: fit-content;
-        animation-name: messagePopup;
-        animation-duration: 0.5s;
-    }
-    .message.user {
-        margin-left: auto;
-        background: #eee;
-        color: #111;
-    }
-    .message.bot {
-        background: #aa1111;
-        color: white;
-    }
-    .message .header {
-        margin-bottom: 0.5em;
-        font-size: 0.75em;
     }
     .message-console {
         margin: auto;
