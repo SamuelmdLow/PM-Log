@@ -5,6 +5,7 @@
 	import ScheduleItem from './ScheduleItem.svelte';
 	import UpcomingScheduleItem from './UpcomingScheduleItem.svelte';
 	import Globe from './Globe.svelte';
+	import Clock from './Clock.svelte';
 	import SearchBox from './search/SearchBox.svelte';
 	import Loader from './Loader.svelte';
 
@@ -105,9 +106,41 @@
 					.filter((edge: any) => new Date(edge.node.datetime) <= now)
 	}
 
+	function predictCurrentLocation(pastSchedule, futureSchedule) {
+		let pastGap = null;
+		let futureGap = null;
+
+		if (pastSchedule.length > 0) {
+			pastGap = new Date(pastSchedule[0].node.datetime).valueOf() - $now.valueOf();
+		}
+		if (futureSchedule.length > 0) {
+			futureGap = new Date(futureSchedule[0].node.datetime).valueOf() - $now.valueOf();
+		}
+		if (pastGap && futureGap) {
+			if (pastGap < futureGap) {
+				return pastSchedule[0].node.location;
+			} else {
+				return futureSchedule[0].node.location;
+			}
+		}
+		else if (pastGap) {
+			return pastSchedule[0].node.location;
+		} else if (futureGap) {
+			return futureSchedule[0].node.location;
+		}
+
+		return {
+			"latitude": 45.4208777,
+            "longitude": -75.6901106,
+            "name": "Ottawa, Ontario",
+            "timezone": "America/Toronto"
+		};
+	}
+
 	addScheduieItems();
 	let futureSchedule = $derived(getFutureSchedule(schedule, $now));
 	let pastSchedule = $derived(getPastSchedule(schedule, $now));
+	let currentLocation = $derived(predictCurrentLocation(pastSchedule, futureSchedule));
 </script>
 
 <svelte:head>
@@ -134,21 +167,13 @@
 	<div class="container">
 		<div class="sidebar">
 			<SearchBox display={"small"} />
+			<div class="dials">
+				<Clock name={"Local"} timezone={Intl.DateTimeFormat().resolvedOptions().timeZone} />
+				<Clock name={currentLocation.name} timezone={currentLocation.timezone} />
+			</div>
 
 			{#if schedule.length > 0}
 				<h2 class="visually-hidden">Future</h2>
-				<div>
-					<div class="local-time-header"><time datetime={$now.toLocaleTimeString()}>{dateFormat($now, null)}</time></div>
-					{#if futureSchedule.length > 0}
-						{#if futureSchedule[0].node.location }
-							<div>{futureSchedule[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, futureSchedule[0].node.location.timezone)}</time></div>
-						{/if}
-					{:else}
-						{#if pastSchedule[0].node.location }
-						<div>{pastSchedule[0].node.location.name}: <time datetime={$now.toLocaleTimeString()}>{dateFormat($now, pastSchedule[0].node.location.timezone)}</time></div>
-						{/if}
-					{/if}
-				</div>
 				{#if futureSchedule.length > 0}
 				<ul>
 					{#each Object.entries(Object.groupBy(futureSchedule, getDate)) as [date, items]}
@@ -166,8 +191,6 @@
 						</li>
 					{/each}
 				</ul>
-				{:else}
-				<p>No schedule available.</p>
 				{/if}
 			{/if}
 		</div>
@@ -227,10 +250,6 @@
 		padding: 0;
 		margin: 0;
 	}
-	.local-time-header {
-		font-size: 2em;
-		font-weight: 600;
-	}
 
 	.date-group {
 		margin-bottom: 2rem;
@@ -252,6 +271,10 @@
   		flex-shrink: 0;
 	}
 
+	.dials {
+		display: flex;
+  		gap: 1em;
+	}
 	.background-map {
 		position: sticky;
 		top: 0;
@@ -283,12 +306,14 @@
 		.container {
 			max-width: 750px;
 			flex-direction: column;
+			gap: 0;
 		}
 		.sidebar {
 			padding: 1.5rem;
 		}
-		.local-time-header {
-			font-size: 1.5em;
+
+		.dials {
+			display: none;
 		}
 	}
 </style>

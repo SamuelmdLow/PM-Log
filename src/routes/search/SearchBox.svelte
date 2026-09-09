@@ -52,14 +52,15 @@
 <div class={"search-box " + display}>
 <form action="{base}/search/">
     <input type="search" name='q' bind:this={input} bind:value={search_value} placeholder={focused ? "Search something..." : placeholder} />
-    <button>Search</button>
+    <button class="button">Search</button>
 </form>
 </div>
 
 <style>
     .search-box {
         margin: 1.5em auto;
-        width: fit-content;
+        width: auto;
+        max-width: 350px;
         input {
             margin-right: 0.5em;
             font-size: 1em;
@@ -67,6 +68,8 @@
             background: none;
             border:none;
             border-bottom: 2px solid var(--color-border);
+            min-width: 0;
+            width: 100%;
         }
         ::placeholder {
             color: var(--color-text-300);
@@ -76,13 +79,7 @@
         ::-ms-input-placeholder { /* Edge 12 -18 */
             color: var(--color-text-300);
         }
-        button {
-            padding: 0.5em 1em;
-            border: 2px solid var(--color-border);
-            border-radius: 0.5em;
-            background: var(--translucent);
-            color: var(--color-text-200)
-        }
+
         form {
             display: flex;
         }

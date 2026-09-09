@@ -122,3 +122,11 @@ mark.highlight .current-word {
 .transcript-container a {
 	text-decoration: underline;
 }
+
+button.button {
+	padding: 0.5em 1em;
+	border: 2px solid var(--color-border);
+	border-radius: 0.5em;
+	background: var(--translucent);
+	color: var(--color-text-200)
+}
