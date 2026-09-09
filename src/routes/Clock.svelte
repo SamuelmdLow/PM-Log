@@ -20,14 +20,15 @@ function getTotalSeconds(date) {
 function drawClock(totalSeconds) {
     var ctx = canvas.getContext("2d");
     const radius = 50;
-    const linewidth = 3.5;
+    const linewidth = 3;
 
     ctx.clearRect(0, 0, radius*2, radius*2);
 
     ctx.lineCap = "round";
     ctx.lineWidth = linewidth;
-    ctx.strokeStyle = "black";
+    ctx.strokeStyle = "#333";
 
+    
     ctx.beginPath();
     ctx.arc(radius, radius, radius-linewidth, 0, 2 * Math.PI);
     ctx.stroke();
@@ -38,8 +39,8 @@ function drawClock(totalSeconds) {
     //ctx.textAlign = "center"; 
     //ctx.fillText(text, radius, radius*1.35, radius);
     
-    const tickLength = 5;
-    const tickWidth = 5;
+    const tickLength = 7;
+    const tickWidth = 3;
     const tickCount = 8
     for (let i=0; i< tickCount; i++) {
         const tickAngle = (i/tickCount) * (Math.PI * 2);
@@ -63,11 +64,12 @@ function drawClock(totalSeconds) {
     drawHand(minutesAngle, minutesHandLength, minutesHandWidth);
 
     function drawHand(angle, length, width) {
+        const innerLength = 7;
         angle = angle + Math.PI/2;
         ctx.lineWidth = width;
         ctx.beginPath();
         ctx.moveTo(radius+(width)*Math.cos(angle), radius+(width)*Math.sin(angle));
-        ctx.lineTo(radius-(length-width-linewidth)*Math.cos(angle), radius-(length-width-linewidth)*Math.sin(angle));
+        ctx.lineTo(radius-(length-width-innerLength)*Math.cos(angle), radius-(length-width-innerLength)*Math.sin(angle));
         ctx.stroke();
     }
 
