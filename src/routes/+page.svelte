@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { now } from '../lib/time.js';
+	import { now } from '$lib/time.js';
 	import { getContextClient } from '@urql/svelte';
-	import TitleHeader from './TitleHeader.svelte';
-	import ScheduleItem from './ScheduleItem.svelte';
-	import UpcomingScheduleItem from './UpcomingScheduleItem.svelte';
-	import Globe from './Globe.svelte';
-	import Clock from './Clock.svelte';
-	import SearchBox from './search/SearchBox.svelte';
-	import Loader from './Loader.svelte';
+	import TitleHeader from '$components/TitleHeader.svelte';
+	import ScheduleItem from '$components/ScheduleItem.svelte';
+	import UpcomingScheduleItem from '$components/UpcomingScheduleItem.svelte';
+	import Globe from '$components/Globe.svelte';
+	import Clock from '$components/Clock.svelte';
+	import SearchBox from '$components/SearchBox.svelte';
+	import Loader from '$components/Loader.svelte';
 
 	let windowWidth = $state(0);
 

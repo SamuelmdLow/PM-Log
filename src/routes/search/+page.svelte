@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
     import { getContextClient } from '@urql/svelte';
-    import { onMount } from 'svelte';
-    import TitleHeader from '../TitleHeader.svelte';
-    import AttachmentResult from './AttachmentResult.svelte';
-    import SearchBox from './SearchBox.svelte';
-    import Loader from '../Loader.svelte';
+    import TitleHeader from '$components/TitleHeader.svelte';
+    import AttachmentResult from '$components/AttachmentResult.svelte';
+    import SearchBox from '$components/SearchBox.svelte';
+    import Loader from '$components/Loader.svelte';
 
     let search = $state("");
     let search_input = $derived(search);

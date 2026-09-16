@@ -18,7 +18,10 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: adapter(),
+			alias: {
+				$components: path.resolve("./src/components"),				
+			}
 		})
 	],
 	optimizeDeps: {
