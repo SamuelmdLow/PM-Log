@@ -4,6 +4,7 @@
     let { video=$bindable(), video_json, currentTime=$bindable(), diarizedSegments=null } = $props();
     let loaded = false;
     let paused = $state(true);
+    let controlElem;
 
     let currentSpeaker = $derived(getCurrentSpeaker(diarizedSegments, currentTime));
 
@@ -60,7 +61,7 @@
             speakerColours[orderedSpeakers[i][0]] = "rgba(" + String(tone) + ", " + String(tone) + ", " + String(tone) + ", 0.33)";
         }
         
-        const currentSpeakerColour = "red";
+        const currentSpeakerColour = "var(--current-speaker)";
         const emptyColour = "#0000";
         let speakerColour = emptyColour;
         let lg = "to right, " + emptyColour;
@@ -92,20 +93,36 @@
                 loadVideo();
                 loaded=true;
             }
-        })
+        });
+        controlElem.addEventListener("keydown", keyControls);
+
+        function keyControls(e) {
+            console.log(e.code);
+            if (e.code == "ArrowRight") {
+                seek(currentTime + 15);
+            } else if (e.code == "ArrowLeft") {
+                seek(currentTime - 15);
+            } else if (e.code == "Space") {
+                if (paused) {
+                    video.play();
+                } else {
+                    video.pause();
+                }
+            }
+        }
     })
 </script>
 
-<div class="video-wrapper">
+<div class="video-wrapper" aria-label="Video Player">
     <video bind:paused={paused} bind:this={video} bind:currentTime={currentTime} poster={video_json['video_poster']} playsinline> </video>
 
-    <div class={"video-control-wrapper" + (paused ? " paused":"")}>
-        <button class="video-inner-play" onclick={() => paused ? video.play() : video.pause()}></button>
+    <div bind:this={controlElem} class={"video-control-wrapper" + (paused ? " paused":"")}>
+        <button class="video-inner-play" onclick={() => paused ? video.play() : video.pause()} onkeydown={(e) => e.preventDefault()}></button>
         {#if diarizedSegments}
         <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments, currentSpeaker)}></div>
         {/if}
-        <div onclick={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
-        <button class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={video.play()}>Unpause</button>
+        <div aria-label="Seeker slider" role="slider" onclick={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
+        <button class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={() =>  paused ? video.play() : video.pause()} onkeydown={(e) => e.preventDefault()}>Unpause</button>
     </div>
 </div>
 
@@ -113,6 +130,8 @@
 	video {
 		display: block;
 		width: 100%;
+        height: auto;
+        aspect-ratio: 16/9;
 	}
     .video-wrapper {
 		margin-bottom: 1em;
@@ -150,6 +169,7 @@
         cursor: pointer;
     }
     .speakerbar {
+        --current-speaker: #cf203d;
         bottom: calc(1em + 7px);
         height: 3px;
     }
