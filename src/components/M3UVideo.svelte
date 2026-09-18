@@ -148,6 +148,9 @@
         bottom: 0;
         cursor: default;
     }
+    .video-inner-play {
+        bottom: 2em;
+    }
     .video-control-wrapper.paused::before {
         content: "";
         position: absolute;
