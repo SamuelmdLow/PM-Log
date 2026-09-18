@@ -5,10 +5,14 @@
     let loaded = false;
     let paused = $state(true);
 
+    let currentSpeaker = $derived(getCurrentSpeaker(diarizedSegments, currentTime));
+
     export function seek(time:number) {
-        console.log(time);
+        if (!loaded) {
+            loadVideo();
+            loaded=true;
+        }
         video.currentTime = time;
-        video.play();
     }
 
     function loadVideo() {
@@ -33,13 +37,13 @@
         return String((100*time) / video_json["video_duration"]) + "%";
     }
 
-    function createSpeakerIndicator(diarizedSegments) {
+    function createSpeakerIndicator(diarizedSegments, currentSpeaker) {
         let speakerDurations = {};
         for (let speakerSegments of diarizedSegments) {
             if (!(speakerSegments['speaker'] in speakerDurations)) {
                     speakerDurations[speakerSegments['speaker']] = 0;
             }
-            speakerDurations[speakerSegments['speaker']] += speakerSegments['segments'][speakerSegments['segments'].length-1]['data']['end'] - speakerSegments['segments'][0]['data']['start'];
+            speakerDurations[speakerSegments['speaker']] += speakerSegments['end'] - speakerSegments['start'];
         }
 
         let orderedSpeakers = Object.keys(speakerDurations).map(function(key) {
@@ -49,26 +53,37 @@
             return second[1] - first[1];
         })
 
-        const colours = ["red", "yellow", "orange"];
+
         let speakerColours = {};
         for (let i=0; i< orderedSpeakers.length; i++) {
-            if (i < colours.length) {
-                speakerColours[orderedSpeakers[i][0]] = colours[i];
-            } else {
-                const tone = 150 - (100 * (i-colours.length)/(orderedSpeakers.length - colours.length));
-                speakerColours[orderedSpeakers[i][0]] = "rgb(" + String(tone) + ", " + String(tone) + ", " + String(tone) + ")";
-            }
+            const tone = 150 - (100 * i/(orderedSpeakers.length));
+            speakerColours[orderedSpeakers[i][0]] = "rgba(" + String(tone) + ", " + String(tone) + ", " + String(tone) + ", 0.33)";
         }
         
-        let lg = "to right, grey";
-        for (let speakerSegments of diarizedSegments) {
-            let speakerColour = speakerColours[speakerSegments['speaker']];
-            const start = progress(speakerSegments['segments'][0]['data']['start']);
-            const end = progress(speakerSegments['segments'][speakerSegments['segments'].length-1]['data']['end']);
-            lg = lg + ", grey " + start + ", " + speakerColour + " " + start + ", " + speakerColour + " " + end + ", grey " + end;
+        const currentSpeakerColour = "red";
+        const emptyColour = "#0000";
+        let speakerColour = emptyColour;
+        let lg = "to right, " + emptyColour;
+        for (let speakerSegment of diarizedSegments) {
+            if (speakerSegment['speaker'] == currentSpeaker) {
+                speakerColour = currentSpeakerColour;
+            } else {
+                speakerColour = speakerColours[speakerSegment['speaker']];
+            }
+            const start = progress(speakerSegment['start']);
+            const end = progress(speakerSegment['end']);
+            lg = lg + ", " + emptyColour + " " + start + ", " + speakerColour + " " + start + ", " + speakerColour + " " + end + ", " + emptyColour + " " + end;
         }
-        console.log(lg);
         return "linear-gradient(" + lg + ")";
+    }
+
+    function getCurrentSpeaker(diarizedSegments, time){
+        for (let speakerSegment of diarizedSegments) {
+            if (speakerSegment['start'] <= time && time <= speakerSegment['end']) {
+                return speakerSegment['speaker'];
+            }
+        }
+        return null;
     }
 
     onMount(() => {
@@ -82,15 +97,14 @@
 </script>
 
 <div class="video-wrapper">
-    <video onclick={() => paused ? video.play() : video.pause()} bind:paused={paused} bind:this={video} bind:currentTime={currentTime} poster={video_json['video_poster']} playsinline> </video>
-    {#if paused}
-        <button onclick={video.play()}>Unpause</button>
-    {/if}
-    <div class="bar">
+    <video bind:paused={paused} bind:this={video} bind:currentTime={currentTime} poster={video_json['video_poster']} playsinline> </video>
+
+    <div class={"video-control-wrapper" + (paused ? " paused":"")} onclick={() => paused ? video.play() : video.pause()}>
         {#if diarizedSegments}
-        <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments)}></div>
+        <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments, currentSpeaker)}></div>
         {/if}
-        <div onclick={(e) => video.currentTime = video_json["video_duration"] * e.offsetX/e.target.offsetWidth} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
+        <div onclick={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
+        <button class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={video.play()}>Unpause</button>
     </div>
 </div>
 
@@ -103,27 +117,42 @@
 		margin-bottom: 1em;
         position: relative;
     }
-    .bar {
-        height: 6px;
-        width: 100%;
-        position: relative;
-    }
-    .bar .innerbar {
+    .video-control-wrapper {
         position: absolute;
         left: 0;
         right: 0;
         top: 0;
         bottom: 0;
     }
-    .playbar {
-        --viewed: rgba(255, 255, 255, 0);
-        --unviewed: rgba(0, 0, 0, 0.3);
-        background: linear-gradient(to right, var(--viewed) var(--progress), var(--unviewed) var(--progress), var(--unviewed));
-    }
-    button {
+    .video-control-wrapper.paused::before {
+        content: "";
         position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, transparent, transparent 80%, #0003);
+    }
+    .innerbar {
+        position: absolute;
+        left: 3em;
+        right: 1em;
+    }
+    .playbar {
+        --viewed: red;
+        --unviewed: grey;
+        background: linear-gradient(to right, var(--viewed) var(--progress), var(--unviewed) var(--progress), var(--unviewed));
+        bottom: 1em;
+        height: 5px;
+        border-radius: 1em;
+    }
+    .speakerbar {
+        bottom: calc(1em + 7px);
+        height: 3px;
+    }
+    .playbutton {
+        position: absolute;
+        left: 0.5em;
+        bottom: 0.25em;
     }
 </style>

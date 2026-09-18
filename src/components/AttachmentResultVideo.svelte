@@ -56,7 +56,7 @@
 
     @media screen and (min-width: 781px) {
         .video-container {
-            max-width: 400px;
+            max-width: 500px;
         }
     }
     @media screen and (max-width: 780px) {

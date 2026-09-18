@@ -59,7 +59,6 @@ function drawClock(totalSeconds) {
 
     const minutesAngle = ((totalSeconds % (60*60))/(60*60)) * 2 * Math.PI;
     const minutesHandLength = radius * 0.9;
-    console.log((totalSeconds % (60*60))/(60*60));
     const minutesHandWidth = 4;
     drawHand(minutesAngle, minutesHandLength, minutesHandWidth);
 

@@ -58,9 +58,10 @@ export function groupBySpeaker(segments) {
         }
         if (speaker == segment_attribution) {
             groups[groups.length-1].segments.push(segment);
+            groups[groups.length-1].end = segment.data.end;
         } else {
             speaker = segment_attribution;
-            groups.push({"speaker": speaker, "segments": [segment]})
+            groups.push({"speaker": speaker, "segments": [segment], "start": segment.data.start, "end": segment.data.end})
         }
     }
     return groups

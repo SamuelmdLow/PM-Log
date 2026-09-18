@@ -114,6 +114,6 @@
 <style>
     .container {
         margin: auto;
-        max-width: 800px;
+        max-width: 900px;
     }
 </style>

@@ -19,8 +19,8 @@
         return lineElem.parentNode.offsetTop + lineElem.offsetTop - 25;
     }
 
-    function jumpToLine(behavior) {
-        const i = scored_content.map(segment => segment.data.end).filter(ordering => ordering < currentTime).length;
+    function jumpToLine(behavior, time) {
+        const i = scored_content.map(segment => segment.data.end).filter(ordering => ordering < time).length;
                     
         const line = transcriptElem.getElementsByClassName('transcript-line')[i];
         transcriptElem.scrollTo({
@@ -34,13 +34,13 @@
         if (transcriptElem && scored_content.length > 0) {
             const i = scored_content.map(segment => segment.score).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
             currentTime = scored_content[i].data.start;
-            jumpToLine("instant");
+            jumpToLine("instant", currentTime);
         }
         setInterval(() => {
             if (videoElem && transcriptElem) {
 
                 if (!videoElem.paused) {
-                    jumpToLine("smooth");
+                    jumpToLine("smooth", currentTime);
                 }
             }
 
@@ -56,7 +56,7 @@
         <div class="speaker-label">{speaker_segment.speaker}</div>
         {#each speaker_segment.segments as segment}
         <p class="transcript-line" style={"--score: " + segment["score"]}>
-            <button class="transcript-line-time-button" onclick={() => video.seek(segment["data"]["start"])}>{durationString(segment["data"]["start"])}</button>
+            <button class="transcript-line-time-button" onclick={() => {video.seek(segment["data"]["start"]); jumpToLine("smooth", segment["data"]["start"]);}}>{durationString(segment["data"]["start"])}</button>
             {#if segment["score"] >  0.25}
                 <mark class={segment["score"] >  0.45 ? "highlight" : ""}>
                     {@html highlightWord(segment["data"], currentTime)}
