@@ -122,7 +122,7 @@
         <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments, currentSpeaker)}></div>
         {/if}
         <div aria-label="Seeker slider" role="slider" onclick={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
-        <button class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={() =>  paused ? video.play() : video.pause()} onkeydown={(e) => e.preventDefault()}>Unpause</button>
+        <button aria-label="Play button" class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={() =>  paused ? video.play() : video.pause()} onkeydown={(e) => e.preventDefault()}></button>
     </div>
 </div>
 
@@ -136,6 +136,9 @@
     .video-wrapper {
 		margin-bottom: 1em;
         position: relative;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
     }
     .video-control-wrapper, .video-inner-play {
         position: absolute;
