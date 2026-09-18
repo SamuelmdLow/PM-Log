@@ -99,7 +99,8 @@
 <div class="video-wrapper">
     <video bind:paused={paused} bind:this={video} bind:currentTime={currentTime} poster={video_json['video_poster']} playsinline> </video>
 
-    <div class={"video-control-wrapper" + (paused ? " paused":"")} onclick={() => paused ? video.play() : video.pause()}>
+    <div class={"video-control-wrapper" + (paused ? " paused":"")}>
+        <button class="video-inner-play" onclick={() => paused ? video.play() : video.pause()}></button>
         {#if diarizedSegments}
         <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments, currentSpeaker)}></div>
         {/if}
@@ -117,12 +118,13 @@
 		margin-bottom: 1em;
         position: relative;
     }
-    .video-control-wrapper {
+    .video-control-wrapper, .video-inner-play {
         position: absolute;
         left: 0;
         right: 0;
         top: 0;
         bottom: 0;
+        cursor: default;
     }
     .video-control-wrapper.paused::before {
         content: "";
@@ -145,6 +147,7 @@
         bottom: 1em;
         height: 5px;
         border-radius: 1em;
+        cursor: pointer;
     }
     .speakerbar {
         bottom: calc(1em + 7px);
