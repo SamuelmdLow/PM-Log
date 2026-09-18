@@ -1,5 +1,6 @@
 <script lang="ts">    
-    import M3UVideo from "./M3UVideo.svelte";
+    import M3UVideo from "$components/M3UVideo.svelte";
+    import { groupBySpeaker } from "$lib/utils";
     let { attachment } = $props();
 
     let json = $derived(JSON.parse(attachment.json));
@@ -12,7 +13,7 @@
     </a>
     -->
     {#if json["video_m3u8"]}
-        <M3UVideo video_json={json} />
+        <M3UVideo video_json={json}/>
     {/if}
     <div class="attachment_link">
         <a href={attachment.source}>{attachment.title}</a>

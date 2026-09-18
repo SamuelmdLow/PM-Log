@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { timeString } from '../lib/utils.ts';
-    import {now} from "../lib/time.js";
+    import { timeString } from '$lib/utils';
+    import {now} from "$lib/time.js";
     
     let { node } = $props();
 

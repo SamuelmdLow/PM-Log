@@ -1,7 +1,6 @@
 <script lang="ts">
-    import TitleHeader from '../TitleHeader.svelte';
-    import ChatBubble from './ChatBubble.svelte';
-    import { dateString } from '$lib/utils';
+    import TitleHeader from '$components/TitleHeader.svelte';
+    import ChatBubble from '$components/ChatBubble.svelte';
 
     let messages = $state([]);
     let query = $state("");
@@ -47,7 +46,7 @@
                 <ChatBubble message={message} />
             {/each}
             {#if loading > 0}
-                <div class="message bot">Loading...</div>
+                <ChatBubble message={{'text': 'Loading...', 'sender': 'bot'}} />
             {/if}
         </div>
 

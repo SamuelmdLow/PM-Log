@@ -3,10 +3,9 @@
     import { getContextClient } from '@urql/svelte';
     import { geoPath, geoOrthographic, geoGraticule, geoDistance } from 'd3-geo';
     import { onMount } from 'svelte';
-    import { select } from 'd3';
-    import { zoom, zoomTransform, zoomIdentity } from 'd3-zoom';
 
     let {focus = $bindable()} = $props();
+    let source = focus;
     let rotation = $state(focus);
 
     const width = 800;
@@ -72,12 +71,17 @@
             const difLat = focus[1] - rotation[1];
             const difTotal = Math.sqrt(Math.pow(difLong, 2) + Math.pow(difLat, 2));
             if (difTotal > 0) {
-                const ratio = Math.min(1/Math.sqrt(difTotal), difTotal);
+                let ratio = 1/Math.sqrt(difTotal);
+                if (ratio > 0.99) {
+                    ratio = 1;
+                }
 
                 rotation[0] = rotation[0] + (difLong * ratio);
                 rotation[1] = rotation[1] + (difLat * ratio);
 
                 projection.rotate(rotation);
+            } else {
+                source = [focus[0], focus[1]];
             }
 
             context.clearRect(0, 0, width, height);
@@ -89,40 +93,41 @@
             geoGenerator({type: 'FeatureCollection', features: geojson.features});
             context.stroke();
 
-            let focusedLocations = [];
-
             for (let location of locations) {
-   
-                let focusDist = geoDistance([location.node.longitude*-1, location.node.latitude*-1],focus);
-                if (focusDist != 0) {
-                    let cord = projection([location.node.longitude, location.node.latitude])
-
-                    let dist = geoDistance([location.node.longitude*-1, location.node.latitude*-1],rotation);
-                    let size = (1 * Math.max(Math.PI - dist, 0)) / Math.PI;
-                    let opacity = ((Math.PI*2) - dist)/ (Math.PI*2*3);
-   
-                    context.fillStyle = "rgba(111, 14, 30, " + String(opacity) + ")";
-                    context.beginPath();
-                    context.arc(cord[0], cord[1], size, 0, 2 * Math.PI);
-                    context.fill();
-                } else {
-                    focusedLocations.push(location);
-                }
-            }
-
-            for (let location of focusedLocations) {
                 let cord = projection([location.node.longitude, location.node.latitude])
 
-                context.fillStyle = "#ff0000";
+                let dist = geoDistance([location.node.longitude*-1, location.node.latitude*-1],rotation);
+                let size = (1 * Math.max(Math.PI - dist, 0)) / Math.PI;
+                let opacity = ((Math.PI*2) - dist)/ (Math.PI*2*2);
+
+                context.fillStyle = "rgba(111, 14, 30, " + String(opacity) + ")";
                 context.beginPath();
-                context.arc(cord[0], cord[1], 2, 0, 2 * Math.PI);
+                context.arc(cord[0], cord[1], size, 0, 2 * Math.PI);
                 context.fill();
             }
 
+            let focusCord = projection([rotation[0]*-1, rotation[1]*-1]);
+            let sourceCord = projection([source[0]*-1, source[1]*-1]);
+            let targetCord = projection([focus[0]*-1, focus[1]*-1]);
+
+            if (difTotal > 0) {
+                context.lineWidth = 2;
+                context.strokeStyle = "#ff0000";
+                context.lineCap = "round";
+                context.beginPath();
+                context.moveTo(sourceCord[0], sourceCord[1]);
+                context.quadraticCurveTo(focusCord[0], focusCord[1], targetCord[0], targetCord[1]);
+                context.stroke();
+            }
+            context.fillStyle = "#ff0000";
+            context.beginPath();
+            context.arc(targetCord[0], targetCord[1], 2, 0, 2 * Math.PI);
+            context.fill();
 
             // Graticule
             let graticule = geoGraticule();
             context.beginPath();
+            context.lineWidth = 0.5;
             context.strokeStyle = '#ccc';
             geoGenerator(graticule());
             context.stroke();

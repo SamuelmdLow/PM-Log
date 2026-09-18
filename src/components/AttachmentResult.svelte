@@ -1,6 +1,6 @@
 <script lang="ts">
-    import AttachmentResultVideo from "./AttachmentResultVideo.svelte";
-    import AtttachmentResultHTML from "./AttachmentResultHTML.svelte";
+    import AttachmentResultVideo from "$components/AttachmentResultVideo.svelte";
+    import AtttachmentResultHTML from "$components/AttachmentResultHTML.svelte";
     import { dateString, durationString } from "$lib/utils";
     let {attachment} = $props();
     let json = $derived(JSON.parse(attachment.json));

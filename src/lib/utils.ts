@@ -38,3 +38,31 @@ export function durationString(duration: number) {
     string = string + String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
     return string;
 }
+
+export function groupBySpeaker(segments) {
+    let speaker = null;
+    let groups = [];
+    let unidentified_voices = [];
+    
+    for (let segment of segments) {
+        let segment_attribution = segment.attribution__name;
+        if (segment_attribution == null) {
+            if (segment.voice_id == null) {
+                segment_attribution = "No speaker diarization yet."    
+            } else {
+                if (!unidentified_voices.includes(segment.voice_id)) {
+                    unidentified_voices.push(segment.voice_id)
+                }
+                segment_attribution = "Unidentified voice #" + String(unidentified_voices.indexOf(segment.voice_id) + 1);
+            }
+        }
+        if (speaker == segment_attribution) {
+            groups[groups.length-1].segments.push(segment);
+            groups[groups.length-1].end = segment.data.end;
+        } else {
+            speaker = segment_attribution;
+            groups.push({"speaker": speaker, "segments": [segment], "start": segment.data.start, "end": segment.data.end})
+        }
+    }
+    return groups
+}
