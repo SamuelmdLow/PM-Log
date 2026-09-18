@@ -121,7 +121,7 @@
         {#if diarizedSegments}
         <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments, currentSpeaker)}></div>
         {/if}
-        <div aria-label="Seeker slider" role="slider" onclick={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
+        <div aria-label="Seeker slider" role="slider" onmouseup={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
         <button aria-label="Play button" class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={() =>  paused ? video.play() : video.pause()} onkeydown={(e) => e.preventDefault()}></button>
     </div>
 </div>
