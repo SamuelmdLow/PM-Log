@@ -86,6 +86,48 @@
         }
         return null;
     }
+    function getVideoDuration(video) {
+        return video ? video.duration ? video.duration : video_json['video_duration'] : video_json['video_duration'];
+    }
+
+    function formatTime(totalSeconds) {
+        const hours = Math.floor(totalSeconds/(60*60));
+        const minutes = Math.floor(totalSeconds%(60*60)/ 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        if (hours > 0) {
+            return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;  
+        }
+        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function getVideoDurationAriaText(totalSeconds) {
+        const hours = Math.floor(totalSeconds/(60*60));
+        const minutes = Math.floor(totalSeconds%(60*60)/ 60);
+        const seconds = Math.floor(totalSeconds % 60);
+
+        const text = hours > 0 ?
+            `${hours} Hours {minutes} Minutes ${seconds} Seconds`
+        :   `${minutes} Minutes ${seconds} Seconds`;
+        return text;
+    }
+
+    function keyControls(e) {
+        console.log(e.code);
+        if (e.code == "ArrowRight") {
+            e.preventDefault()
+            seek(currentTime + 15);
+        } else if (e.code == "ArrowLeft") {
+            e.preventDefault()
+            seek(currentTime - 15);
+        } else if (e.code == "Space" || e.code == "KeyK") {
+            e.preventDefault()
+            if (paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+    }
 
     onMount(() => {
         video.addEventListener("play", () => {
@@ -95,38 +137,32 @@
             }
         });
         controlElem.addEventListener("keydown", keyControls);
-
-        function keyControls(e) {
-            console.log(e.code);
-            if (e.code == "ArrowRight") {
-                seek(currentTime + 15);
-            } else if (e.code == "ArrowLeft") {
-                seek(currentTime - 15);
-            } else if (e.code == "Space") {
-                if (paused) {
-                    video.play();
-                } else {
-                    video.pause();
-                }
-            }
-        }
     })
 </script>
 
 <div class="video-wrapper" aria-label="Video Player">
-    <video bind:paused={paused} bind:this={video} bind:currentTime={currentTime} poster={video_json['video_poster']} playsinline> </video>
+    <video tabindex="-1" bind:paused={paused} bind:this={video} bind:currentTime={currentTime} poster={video_json['video_poster']} playsinline> </video>
 
     <div bind:this={controlElem} class={"video-control-wrapper" + (paused ? " paused":"")}>
-        <button class="video-inner-play" onclick={() => paused ? video.play() : video.pause()} onkeydown={(e) => e.preventDefault()}></button>
-        {#if diarizedSegments}
-        <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments, currentSpeaker)}></div>
-        {/if}
-        <div aria-label="Seeker slider" role="slider" onmouseup={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
-        <button aria-label="Play button" class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={() =>  paused ? video.play() : video.pause()} onkeydown={(e) => e.preventDefault()}></button>
+        <button tabindex="-1" class="video-inner-play" onclick={() => paused ? video.play() : video.pause()} onkeydown={keyControls}></button>
+
+        <button tabindex="0" aria-label="Play button shortcut k" class={"playbutton " + (paused ? "playbutton boxicons--play-filled" : "boxicons--pause-filled")} onclick={() =>  paused ? video.play() : video.pause()} onkeydown={keyControls}></button>
+
+        <div class="video-control-bottom-row">
+            <div class="bars">
+                {#if diarizedSegments}
+                <div class="speakerbar innerbar" style:background={createSpeakerIndicator(diarizedSegments, currentSpeaker)}></div>
+                {/if}
+                <div tabindex="0" aria-label="Seeker slider" role="slider" aria-valuenow={currentTime} aria-valuemin="0" aria-valuemax={getVideoDuration(video)} aria-valuetext={getVideoDurationAriaText(currentTime) + " of " + getVideoDurationAriaText(getVideoDuration(video))}
+                onkeydown={keyControls} onmouseup={(e) => seek(video_json["video_duration"] * e.offsetX/e.target.offsetWidth)} class="playbar innerbar" style:--progress={progress(currentTime)}></div>
+            </div>
+
+            <div class="durationMark">{formatTime(currentTime)} <span class="full-duration">{formatTime(getVideoDuration(video))}</span></div>
+        </div>
     </div>
 </div>
 
-<style>
+<style lang="scss">
 	video {
 		display: block;
 		width: 100%;
@@ -148,25 +184,45 @@
         bottom: 0;
         cursor: default;
     }
+    .video-control-bottom-row {
+        display: flex;
+        position: absolute;
+        bottom: 0;
+        left: 3em;
+        right: 1em;
+    }
     .video-inner-play {
         bottom: 2em;
     }
-    .video-control-wrapper.paused::before {
+    .video-control-wrapper::before {
         content: "";
+        opacity: 0;
         position: absolute;
         left: 0;
         right: 0;
         top: 0;
         bottom: 0;
-        background: linear-gradient(to bottom, transparent, transparent 80%, #0003);
+        background: linear-gradient(to bottom, transparent, transparent 80%, #0005);
+        transition: opacity 0.5s;
+    }
+    .video-control-wrapper.paused, .video-control-wrapper:hover {
+        &::before {
+            opacity: 1;
+        }
+        > * {
+            filter: drop-shadow(0 0 0.5em black);
+        }
+    }
+    .bars {
+        width: 100%;
+        position: relative;
     }
     .innerbar {
         position: absolute;
-        left: 3em;
-        right: 1em;
+        width: 100%;
     }
     .playbar {
-        --viewed: red;
+        --viewed: #eee;
         --unviewed: grey;
         background: linear-gradient(to right, var(--viewed) var(--progress), var(--unviewed) var(--progress), var(--unviewed));
         bottom: 1em;
@@ -175,13 +231,26 @@
         cursor: pointer;
     }
     .speakerbar {
-        --current-speaker: #cf203d;
-        bottom: calc(1em + 7px);
+        --current-speaker: #cf203db2;
         height: 3px;
+        bottom: calc(1em + 9px);
     }
     .playbutton {
         position: absolute;
-        left: 0.5em;
-        bottom: 0.25em;
+        bottom: .25em;
+        left: .5em;
+    }
+    .durationMark {
+        margin-bottom: 0.7em;
+        margin-left: 1em;
+        flex-shrink: 0;
+        color: white;
+        font-size: 14px;
+        .full-duration {
+            &::before {
+                content: "/ "
+            }
+            color: #ddd;
+        }
     }
 </style>
