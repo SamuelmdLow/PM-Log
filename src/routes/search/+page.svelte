@@ -19,16 +19,15 @@
 
 	const SEARCH_QUERY = `
 		query MyQuery($search: String!, $limit: Int!, $offset: Int!) {
-			attachmentsSemanticSearch(query: $search, first: $limit, offset: $offset) {
+			allAttachments(query: $search, first: $limit, offset: $offset) {
                 edges {
                     node {
                         id
                         title
-                        content
                         json
                         publishedAt
                         source
-                        scoredContent(query: $search)
+                        content(query: $search)
                     }
                 }
 			}
@@ -46,10 +45,10 @@
                 .query(SEARCH_QUERY, {"search": query, "limit": limit, "offset": offset})
                 .toPromise()
                 .then(result => {
-                    if (result.data.attachmentsSemanticSearch.edges.length < limit ) {
+                    if (result.data.allAttachments.edges.length < limit ) {
                         endOfResults = true;
                     }
-                    search_response = search_response.concat(result.data.attachmentsSemanticSearch.edges);
+                    search_response = search_response.concat(result.data.allAttachments.edges);
                     loading = false;
                 }).catch(reason => {
                     error = true;

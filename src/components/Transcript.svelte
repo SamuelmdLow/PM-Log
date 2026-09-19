@@ -1,7 +1,7 @@
 <script>
     import { durationString } from "$lib/utils";
     import { onMount } from "svelte";
-    let {scored_content, video, diarizedSegments, currentTime=$bindable(), videoElem=$bindable()} = $props();
+    let {content, video, diarizedSegments, currentTime=$bindable(), videoElem=$bindable()} = $props();
     let transcriptElem;
 
 
@@ -20,7 +20,7 @@
     }
 
     function jumpToLine(behavior, time) {
-        const i = scored_content.map(segment => segment.data.end).filter(ordering => ordering < time).length;
+        const i = content.map(segment => segment.data.end).filter(ordering => ordering < time).length;
                     
         const line = transcriptElem.getElementsByClassName('transcript-line')[i];
         transcriptElem.scrollTo({
@@ -31,9 +31,9 @@
     }
 
     onMount(() => {
-        if (transcriptElem && scored_content.length > 0) {
-            const i = scored_content.map(segment => segment.score).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
-            currentTime = scored_content[i].data.start;
+        if (transcriptElem && content.length > 0) {
+            const i = content.map(segment => segment.score).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+            currentTime = content[i].data.start;
             jumpToLine("instant", currentTime);
         }
         setInterval(() => {
@@ -49,7 +49,7 @@
 
 </script>
 
-{#if scored_content.length > 0}
+{#if content.length > 0}
 <div bind:this={transcriptElem} class="transcript">
     {#each diarizedSegments as speaker_segment}
     <div class="speaker-group">

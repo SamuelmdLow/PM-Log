@@ -4,6 +4,7 @@
     let { attachment } = $props();
 
     let json = $derived(JSON.parse(attachment.json));
+    let diarizedSegments = $derived(groupBySpeaker(JSON.parse(attachment.content)));
 </script>
 
 <li class="attachment">
@@ -13,7 +14,7 @@
     </a>
     -->
     {#if json["video_m3u8"]}
-        <M3UVideo video_json={json}/>
+        <M3UVideo video_json={json} diarizedSegments={diarizedSegments}/>
     {/if}
     <div class="attachment_link">
         <a href={attachment.source}>{attachment.title}</a>
@@ -21,7 +22,7 @@
 </li>
 
 <style>
-    li {
+li {
     list-style: none;
 }
 

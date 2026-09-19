@@ -3,12 +3,12 @@
     import { dateString, durationString } from "$lib/utils";
     let {attachment} = $props();
     let json = $derived(JSON.parse(attachment.json));
-    let scored_content = $derived(JSON.parse(attachment.scoredContent));
+    let content = $derived(JSON.parse(attachment.content));
     let htmlElem;
 
     onMount(() => {
         if (htmlElem && htmlElem.children.length > 0) {
-            const i = scored_content.map(segment => segment.score).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+            const i = content.map(segment => segment.score).reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
             htmlElem.scrollTo(0, htmlElem.children[i].offsetTop);
         }
     })
@@ -40,9 +40,9 @@
     </div>
 
     <div class="transcript-container">
-        {#if scored_content.length > 0}
+        {#if content.length > 0}
         <div bind:this={htmlElem} class="transcript">
-            {#each scored_content as segment}
+            {#each content as segment}
                 {#if segment["score"] >  0.25}
                     {@html wrapInnerWithMark(segment["data"]["html"], segment["score"])}
                 {:else}

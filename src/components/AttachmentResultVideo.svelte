@@ -5,12 +5,12 @@
     import { dateString } from "$lib/utils";
     let {attachment} = $props();
     let json = $derived(JSON.parse(attachment.json));
-    let scored_content = $derived(JSON.parse(attachment.scoredContent));
+    let content = $derived(JSON.parse(attachment.content));
     let currentTime = $state(0);
     let video;
     let videoElem;
 
-    let diarizedSegments = $derived(groupBySpeaker(scored_content));
+    let diarizedSegments = $derived(groupBySpeaker(content));
 </script>
 
 <div class="result-container">
@@ -25,7 +25,7 @@
     </div>
 
     <div class="transcript-container">
-        <Transcript scored_content={scored_content} diarizedSegments={diarizedSegments} video={video} bind:videoElem={videoElem} bind:currentTime={currentTime} /> 
+        <Transcript content={content} diarizedSegments={diarizedSegments} video={video} bind:videoElem={videoElem} bind:currentTime={currentTime} /> 
     </div>
 </div>
 
