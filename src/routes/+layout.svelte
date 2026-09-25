@@ -6,7 +6,7 @@
 	let { children } = $props();
 
 	const client = new Client({
-		url: 'https://pmlog.ca/graphql',
+		url: 'http://localhost:8000/graphql',
 		exchanges: [cacheExchange, fetchExchange],
 	});
 

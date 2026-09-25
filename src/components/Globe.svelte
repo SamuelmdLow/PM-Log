@@ -112,14 +112,14 @@
 
             if (difTotal > 0) {
                 context.lineWidth = 2;
-                context.strokeStyle = "#ff0000";
+                context.strokeStyle = "#C71A37";
                 context.lineCap = "round";
                 context.beginPath();
                 context.moveTo(sourceCord[0], sourceCord[1]);
                 context.quadraticCurveTo(focusCord[0], focusCord[1], targetCord[0], targetCord[1]);
                 context.stroke();
             }
-            context.fillStyle = "#ff0000";
+            context.fillStyle = "#C71A37";
             context.beginPath();
             context.arc(targetCord[0], targetCord[1], 2, 0, 2 * Math.PI);
             context.fill();

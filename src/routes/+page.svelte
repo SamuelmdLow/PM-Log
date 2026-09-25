@@ -13,7 +13,7 @@
 
 	let selectedCoordinate = $state([79.3839347, -43.6534817]);
 
-	let limit = 100;
+	let limit = 50;
 	let offset = $state(0);
 	let loading = $state(true);
 
@@ -34,6 +34,7 @@
 							attachments {
 								edges {
 									node {
+										publishedAt
 										title
 										content
 										source
@@ -195,7 +196,7 @@
 			{/if}
 		</div>
 
-		<div>
+		<div class="schedule-items">
 			{#if schedule.length > 0}
 				<ul>
 					{#each Object.entries(Object.groupBy( pastSchedule, getDate )) as [date, items]}
@@ -241,8 +242,14 @@
 		flex-direction: row;
 		justify-content: space-between;
 		width: 100%;
-		max-width: 1100px;
+		max-width: 1200px;
 		gap: 1.5em;
+	}
+
+	@media screen and (min-width: 1000px) {
+		.schedule-items {
+			max-width: 500px;
+		}
 	}
 
 	ul {

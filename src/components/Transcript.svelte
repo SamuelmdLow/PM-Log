@@ -92,8 +92,8 @@
         scroll-margin: 1em;
     }
     .transcript-line mark {
-        background-color: rgb(255, 0,0, calc(0.5* var(--score)));
-        border-left: 0.25em solid rgb(255, 0,0, var(--score));
+        background-color: rgb(240, 31, 66, calc(0.5* var(--score)));
+        border-left: 0.25em solid rgb(240, 31, 66, var(--score));
         padding-left: 0.25em;
     }
     .transcript-line-time-button {

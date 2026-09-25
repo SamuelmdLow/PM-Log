@@ -111,8 +111,8 @@ mark.highlight .current-word {
 }
 
 .transcript-container .marked {
-	--border-colour: rgb(255, 0,0, var(--score));
-	--highlight-colour: rgb(255, 0,0, calc(0.25 * var(--score)));
+	--border-colour: rgb(240, 31, 66, var(--score));
+	--highlight-colour: rgb(240, 31, 66, calc(0.25 * var(--score)));
 
 	padding-left: 0.5em;
 	border-left: 0.25em solid var(--border-colour);

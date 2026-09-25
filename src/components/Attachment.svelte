@@ -1,5 +1,6 @@
 <script lang="ts">    
     import M3UVideo from "$components/M3UVideo.svelte";
+    import Vote from "./Vote.svelte";
     import { groupBySpeaker } from "$lib/utils";
     let { attachment } = $props();
 
@@ -15,10 +16,17 @@
     -->
     {#if json["video_m3u8"]}
         <M3UVideo video_json={json} diarizedSegments={diarizedSegments}/>
+        <div class="attachment_link">
+            <a href={attachment.source}>{attachment.title}</a>
+        </div>
+    {:else if json["ourcommons_votes"]}
+        <Vote attachment={attachment} />
+    {:else}
+        <div class="attachment_link">
+            <a href={attachment.source}>{attachment.title}</a>
+        </div>
     {/if}
-    <div class="attachment_link">
-        <a href={attachment.source}>{attachment.title}</a>
-    </div>
+
 </li>
 
 <style>
