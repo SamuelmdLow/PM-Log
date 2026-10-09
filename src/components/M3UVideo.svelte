@@ -168,6 +168,8 @@
 		width: 100%;
         height: auto;
         aspect-ratio: 16/9;
+        object-fit: cover;
+        object-position: center;
 	}
     .video-wrapper {
 		margin-bottom: 1em;

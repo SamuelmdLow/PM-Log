@@ -1,9 +1,10 @@
 <script>
     import { durationString } from "$lib/utils";
     import { onMount } from "svelte";
+    import ResultScrollbarIndicator from "./ResultScrollbarIndicator.svelte";
     let {content, video, diarizedSegments, currentTime=$bindable(), videoElem=$bindable()} = $props();
     let transcriptElem;
-
+    const scoreHighlightThreshold = 0.25;
 
     function highlightWord(data, time) {
         let words = structuredClone(data.words);
@@ -14,17 +15,20 @@
         }
         return words.map(word => word.word).join('');
     }
-
-    function getTranscriptLineOffset(lineElem) {
-        return lineElem.parentNode.offsetTop + lineElem.offsetTop - 25;
+    function getTranscriptElemOffset(elem) {
+        return elem.parentNode.offsetTop + elem.offsetTop;
+    }
+    function getTranscriptLineJumpOffset(lineElem) {
+        return getTranscriptElemOffset(lineElem) - 25;
     }
 
     function jumpToLine(behavior, time) {
         const i = content.map(segment => segment.data.end).filter(ordering => ordering < time).length;
                     
         const line = transcriptElem.getElementsByClassName('transcript-line')[i];
+
         transcriptElem.scrollTo({
-            top: getTranscriptLineOffset(line),
+            top: getTranscriptLineJumpOffset(line),
             left: 0,
             behavior: behavior,
             });
@@ -50,25 +54,28 @@
 </script>
 
 {#if content.length > 0}
-<div bind:this={transcriptElem} class="transcript">
-    {#each diarizedSegments as speaker_segment}
-    <div class="speaker-group">
-        <div class="speaker-label">{speaker_segment.speaker}</div>
-        {#each speaker_segment.segments as segment}
-        <p class="transcript-line" style={"--score: " + segment["score"]}>
-            <button class="transcript-line-time-button" onclick={() => {video.seek(segment["data"]["start"]); jumpToLine("smooth", segment["data"]["start"]);}}>{durationString(segment["data"]["start"])}</button>
-            {#if segment["score"] >  0.25}
-                <mark class={segment["score"] >  0.45 ? "highlight" : ""}>
+<div class="transcript">
+    <div class="transcript-contents" bind:this={transcriptElem}>
+        {#each diarizedSegments as speaker_segment}
+        <div class="speaker-group">
+            <div class="speaker-label">{speaker_segment.speaker}</div>
+            {#each speaker_segment.segments as segment}
+            <p class="transcript-line" style={"--score: " + segment["score"]}>
+                <button class="transcript-line-time-button" onclick={() => {video.seek(segment["data"]["start"]); jumpToLine("smooth", segment["data"]["start"]);}}>{durationString(segment["data"]["start"])}</button>
+                {#if segment["score"] > scoreHighlightThreshold}
+                    <mark class={segment["score"] >  0.45 ? "highlight" : ""}>
+                        {@html highlightWord(segment["data"], currentTime)}
+                    </mark>
+                {:else}
                     {@html highlightWord(segment["data"], currentTime)}
-                </mark>
-            {:else}
-                {@html highlightWord(segment["data"], currentTime)}
-            {/if}
-        </p>
+                {/if}
+            </p>
+            {/each}
+        </div>
         {/each}
     </div>
-    {/each}
 </div>
+<ResultScrollbarIndicator transcriptElem={transcriptElem} getTranscriptElemOffset={getTranscriptElemOffset} />
 {:else}
 <p>No transcript generated yet.</p>
 {/if}
@@ -100,14 +107,13 @@
         font-size: 0.75em;
         color: var(--color-text-300);
     }
-    .transcript {
+    .transcript-contents {
         overflow-y: scroll;
         font-size: 15px;
     }
 
-
     @media screen and (min-width: 781px) {
-        .transcript {
+        .transcript-contents {
             padding-right: 1em;
             position: absolute;
             top: 0;
@@ -115,7 +121,7 @@
         }
     }
     @media screen and (max-width: 780px) {
-        .transcript {
+        .transcript-contents {
             max-height: 300px;
         }
     }

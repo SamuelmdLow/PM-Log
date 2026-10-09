@@ -29,7 +29,9 @@
 	--color-bg-2: hsl(224, 44%, 95%);
 	
 	--color-theme-1: #6F0E1E;
-	--color-theme-2: #4075a6;
+	--color-theme-2: #9E152B;
+	--color-theme-3: #C71A37;
+	--color-theme-3: #F01F42;
 	
 	--color-text-100: rgba(0, 0, 0, 0.9);	
 	--color-text-200: rgba(0, 0, 0, 0.7);
@@ -85,6 +87,10 @@ button {
 	font-size: 1em;
 }
 
+summary {
+	cursor: pointer;
+}
+
 .loader {
 	text-align: center;
 	width: fit-content;
@@ -121,6 +127,19 @@ mark.highlight .current-word {
 
 .transcript-container a {
 	text-decoration: underline;
+}
+
+.scrollbar-indicator {
+	position: absolute;
+	right: 0;
+	top: 1em;
+	bottom: 1em;
+	width: 2px;
+	.indicator {
+		width: 100%;
+		position: absolute;
+		background-color: rgb(240, 31, 66, var(--score));
+	}
 }
 
 button.button {

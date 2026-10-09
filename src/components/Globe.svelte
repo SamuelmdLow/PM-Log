@@ -26,7 +26,7 @@
             hasNextPage
             }
         }
-        }`
+        }`;
 
     const client = getContextClient();
     const limit = 100;

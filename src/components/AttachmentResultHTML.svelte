@@ -1,10 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import ResultScrollbarIndicator from "./ResultScrollbarIndicator.svelte";
     import { dateString, durationString } from "$lib/utils";
+	import { html } from "d3";
     let {attachment} = $props();
     let json = $derived(JSON.parse(attachment.json));
     let content = $derived(JSON.parse(attachment.content));
     let htmlElem;
+    const scoreHighlightThreshold = 0.25;
 
     onMount(() => {
         if (htmlElem && htmlElem.children.length > 0) {
@@ -13,11 +16,10 @@
         }
     })
 
-
     function wrapInnerWithMark(html, score) {
         const elems = ["p", "h1", "h2", "h3", "h4", "li"];
 
-        let classList = "marked";
+        let classList = "transcript-line marked";
         if (score > 0.45) {
             classList = classList + " higlight"; 
         }
@@ -26,6 +28,10 @@
             html = html.replaceAll("<" + elem + ">", "<" + elem + attributes + ">");
         }
         return html
+    }
+
+    function getTranscriptElemOffset(elem) {
+        return elem.offsetTop;
     }
 </script>
 
@@ -43,13 +49,14 @@
         {#if content.length > 0}
         <div bind:this={htmlElem} class="transcript">
             {#each content as segment}
-                {#if segment["score"] >  0.25}
+                {#if segment["score"] >  scoreHighlightThreshold}
                     {@html wrapInnerWithMark(segment["data"]["html"], segment["score"])}
                 {:else}
                     {@html segment["data"]["html"]}
                 {/if}
             {/each}
         </div>
+        <ResultScrollbarIndicator transcriptElem={htmlElem} getTranscriptElemOffset={getTranscriptElemOffset} />
         {:else}
         <p>No transcript generated yet.</p>
         {/if}
